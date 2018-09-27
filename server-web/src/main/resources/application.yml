@@ -1,0 +1,9 @@
+spring:
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true
+
+pushfight:
+  security:
+    accounts: '[]'
+    signing-key: ''

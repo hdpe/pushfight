@@ -1,0 +1,4 @@
+curl -sH "Content-Type: application/json" \
+	-d "{\"accessKeyId\":\"${PUSHFIGHT_ACCESS_KEY_ID}\",\"secret\":\"${PUSHFIGHT_SECRET}\"}" \
+	http://localhost:8080/token \
+		| jq -r '.token'
