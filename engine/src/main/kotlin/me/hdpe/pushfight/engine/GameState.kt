@@ -61,7 +61,7 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
 
         verifyVacantPath(startX, startY, endX, endY)
 
-        return applyMove(startX, startY, endX, endY)
+        return applyMove(startX, startY, endX, endY, incrementMoves = true)
     }
 
     fun withPush(player: Player, startX: Int, startY: Int, endX: Int, endY: Int): GameState {
@@ -256,18 +256,20 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
         return GameState(config, updatedSetup, turn, updatedBoard)
     }
 
-    private fun applyMove(startX: Int, startY: Int, endX: Int, endY: Int): GameState {
+    private fun applyMove(startX: Int, startY: Int, endX: Int, endY: Int, incrementMoves: Boolean = false): GameState {
         val movingPiece = board.getSquare(startX, startY).piece
 
         val updatedBoard = board
                 .withSquare(startX, startY, BoardSquare(null))
                 .withSquare(endX, endY, BoardSquare(movingPiece))
 
-        return GameState(config, setup, turn.withMovesIncremented(), updatedBoard, victor)
+        val updatedTurn = if (incrementMoves) turn.withMovesIncremented() else turn
+
+        return GameState(config, setup, updatedTurn, updatedBoard)
     }
 
     private fun applySetupConfirmed(player: Player): GameState {
-        return GameState(config, setup.withPlayerSetupComplete(getPlayerNumber(player)), turn, board, victor)
+        return GameState(config, setup.withPlayerSetupComplete(getPlayerNumber(player)), turn, board)
     }
 
     private fun applyPush(startX: Int, startY: Int, xDelta: Int, yDelta: Int): GameState {

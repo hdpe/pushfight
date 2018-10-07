@@ -174,14 +174,15 @@ class GameStateTest {
         @Test
         fun `withUpdatedPlacements with legal placements returns new GameState`() {
             val (piece1, piece2) = listOf(Pawn(player1), King(player1))
+            val turn = newTurn()
 
-            val before = GameState(config, incompleteSetupForPlayer(player1), newTurn(),
+            val before = GameState(config, incompleteSetupForPlayer(player1), turn,
                     singleRowBoard(BoardSquare(piece1), BoardSquare(piece2), BoardSquare()))
 
             val after = before.withUpdatedPlacements(player1, listOf(UpdatedPlacementCommand(0, 0, 2, 0)))
 
             assertThat(after, matchesGameState(config, squares = arrayOf(
-                    squareArray(BoardSquare(), BoardSquare(piece2), BoardSquare(piece1)))))
+                    squareArray(BoardSquare(), BoardSquare(piece2), BoardSquare(piece1))), turn = equalTo(turn)))
         }
     }
 
@@ -366,7 +367,7 @@ class GameStateTest {
         @Test
         fun `withMove with legal move returns new GameState`() {
             val pieceToMove = newPiece(player1)
-            val before = GameState(config, completedSetup(), newTurn(player1), Board(arrayOf(
+            val before = GameState(config, completedSetup(), newTurn(player1, moves = 0), Board(arrayOf(
                     squareArray(AbyssSquare(), BoardSquare()),
                     squareArray(BoardSquare(pieceToMove), BoardSquare()))))
 
