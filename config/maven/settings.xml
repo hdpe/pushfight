@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<settings>
+	<profiles>
+		<profile>
+			<id>jcenter</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<repositories>
+				<repository>
+					<id>jcenter</id>
+					<url>http://jcenter.bintray.com/</url>
+				</repository>
+			</repositories>
+		</profile>
+	</profiles>
+</settings>
