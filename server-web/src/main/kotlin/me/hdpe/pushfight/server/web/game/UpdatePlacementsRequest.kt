@@ -8,5 +8,5 @@ class UpdatePlacementsRequest(
 
         @get:Valid
         @get:NotNull(message = "{NotNull.UpdatePlacementsRequest.placements}")
-        val placements: List<UpdatedPlacement>?
+        var placements: Array<UpdatedPlacement>?
 ) : AbstractPlayRequest(playerNumber)

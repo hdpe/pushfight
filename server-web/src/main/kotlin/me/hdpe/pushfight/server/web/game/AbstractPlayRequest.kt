@@ -1,10 +1,12 @@
 package me.hdpe.pushfight.server.web.game
 
+import org.hibernate.validator.constraints.Range
 import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
 abstract class AbstractPlayRequest(
-        @get:NotBlank(message = "{NotBlank.AbstractPlayRequest.playerNumber}")
-        @get:Size(min = 1, max = 2, message = "{Size.AbstractPlayRequest.playerNumber}")
-        val playerNumber: Int?
+        @get:NotNull(message = "{NotNull.AbstractPlayRequest.playerNumber}")
+        @get:Range(min = 1, max = 2, message = "{Range.AbstractPlayRequest.playerNumber}")
+        var playerNumber: Int?
 )

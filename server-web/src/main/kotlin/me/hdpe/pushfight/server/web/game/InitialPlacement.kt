@@ -5,11 +5,11 @@ import javax.validation.constraints.NotNull
 
 class InitialPlacement(
         @get:NotNull(message = "{NotNull.InitialPlacement.pieceType}")
-        val pieceType: PieceType?,
+        var pieceType: PieceType?,
 
         @get:NotNull(message = "{NotNull.InitialPlacement.x}")
-        val x: Int?,
+        var x: Int?,
 
         @get:NotNull(message = "{NotNull.InitialPlacement.y}")
-        val y: Int?
+        var y: Int?
 )

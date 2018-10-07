@@ -1,6 +1,7 @@
 package me.hdpe.pushfight.server.web.security
 
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
@@ -27,8 +28,6 @@ class WebSecurityConfig(val authenticationProvider: AccessKeyAuthenticationProvi
     override fun configure(http: HttpSecurity) {
         http
             .authorizeRequests()
-//                .antMatchers("/token")
-//                    .permitAll()
                 .anyRequest()
                     .authenticated()
                 .and()
@@ -43,7 +42,7 @@ class WebSecurityConfig(val authenticationProvider: AccessKeyAuthenticationProvi
     override fun configure(web: WebSecurity) {
         web
             .ignoring()
-                .antMatchers("/token", "/error")
+                .antMatchers("/token", "/error", "/v2/api-docs", "/docs")
     }
 
     private fun jwtAuthenticationFilter() = JwtAuthenticationFilter(signingKeyProvider, securityContextAccessor)

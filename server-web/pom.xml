@@ -13,9 +13,30 @@
 	
 	<artifactId>pushfight-server-web</artifactId>
 	
+	<properties>
+		<asciidoctor.input.directory>${project.build.directory}/asciidoc/generated</asciidoctor.input.directory>
+		<asciidoctor.html.output.directory>${project.build.directory}/classes/static/docs</asciidoctor.html.output.directory>
+	</properties>
+	
 	<build>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<includes>
+							<include>WriteApiExamples</include>
+							<include>WriteSwaggerDocumentation</include>
+						</includes>
+						<runOrder>alphabetical</runOrder>
+						<test>WriteApiExamples, WriteSwaggerDocumentation</test>
+						<systemProperties>
+							<!--<spring.profiles.active>generate-docs</spring.profiles.active>-->
+							<examples.dir>${project.build.directory}/examples</examples.dir>
+						</systemProperties>
+					</configuration>
+				</plugin>
+				
 				<plugin>
 					<groupId>org.jetbrains.kotlin</groupId>
 					<artifactId>kotlin-maven-plugin</artifactId>
@@ -34,6 +55,48 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		
+		<plugins>
+			<plugin>
+				<groupId>org.asciidoctor</groupId>
+				<artifactId>asciidoctor-maven-plugin</artifactId>
+				<version>1.5.5</version>
+				<configuration>
+					<sourceDirectory>src/test/resources/asciidoc</sourceDirectory>
+					<sourceDocumentName>index.adoc</sourceDocumentName>
+					<attributes>
+						<doctype>book</doctype>
+						<toc>left</toc>
+						<toclevels>3</toclevels>
+						<numbered>true</numbered>
+						<hardbreaks>true</hardbreaks>
+						<sectlinks>true</sectlinks>
+						<sectanchors>true</sectanchors>
+						<generated>${asciidoctor.input.directory}</generated>
+					</attributes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>output-html</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>process-asciidoc</goal>
+						</goals>
+						<configuration>
+							<backend>html5</backend>
+							<outputDirectory>${asciidoctor.html.output.directory}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.jruby</groupId>
+						<artifactId>jruby-complete</artifactId>
+						<version>9.1.15.0</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
 	</build>
 	
 	<dependencies>
@@ -50,6 +113,16 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-module-kotlin</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>io.github.swagger2markup</groupId>
+			<artifactId>swagger2markup</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>io.github.swagger2markup</groupId>
+			<artifactId>swagger2markup-import-files-ext</artifactId>
 		</dependency>
 		
 		<dependency>
@@ -70,6 +143,27 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-bean-validators</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<optional>true</optional>
@@ -81,14 +175,20 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-api</artifactId>
-			<version>RELEASE</version>
-			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 

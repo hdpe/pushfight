@@ -4,14 +4,14 @@ import javax.validation.constraints.NotNull
 
 class UpdatedPlacement(
         @get:NotNull(message = "{NotNull.UpdatedPlacement.currentX}")
-        val currentX: Int?,
+        var currentX: Int?,
 
         @get:NotNull(message = "{NotNull.UpdatedPlacement.currentY}")
-        val currentY: Int?,
+        var currentY: Int?,
         
         @get:NotNull(message = "{NotNull.UpdatedPlacement.newX}")
-        val newX: Int?,
+        var newX: Int?,
         
         @get:NotNull(message = "{NotNull.UpdatedPlacement.newY}")
-        val newY: Int?
+        var newY: Int?
 )

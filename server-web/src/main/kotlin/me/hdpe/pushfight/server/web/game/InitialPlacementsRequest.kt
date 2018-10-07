@@ -8,5 +8,5 @@ class InitialPlacementsRequest(
 
         @get:Valid
         @get:NotNull(message = "{NotNull.placements}")
-        val placements: List<InitialPlacement>?
+        var placements: Array<InitialPlacement>?
 ) : AbstractPlayRequest(playerNumber)
