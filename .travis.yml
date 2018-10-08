@@ -8,6 +8,3 @@ deploy:
   api_key:
     secure: "1Mkb2sudZIOe1IHp3b1YZCRsh93HqreMJTf97QOJdMTnOazKWgmuEKT8JBx4MlErbgGOUq0/qNdcbvgcNKL6SB71nWJDAkoB4qFeh/Lf7gHQIOhojMbHRIBPUp9kaY7pGsDp8gNnIpqhjE4h5gx30eVwSL51JPR9uUT4WaSvlhn7MByd/quxZWrF6XYKexpGBmjB1z0BSKwJaQBeIIkinKZZQokOtuNash7C0dGqL8KzTWSxq7zZl3MLwm0ZQu0HA0uzAmPNZKwnPhiQoSn7fSMa7y+JDcp9rOfU/o2kByf3EYgAGG/WbN3zn3UjoZT8l1Jb0SkJsdQ625kD5C57U17B2zosAw5Gw+iQUhGi8kh4ZTPlApPCJJZsLCr59PULIKtlq7pZdcgtoLIia7+wVD8OAE+zw9ekSWRxTZ6PN/MfHEzCsIHLloDamMTYXhskttjGpfV00vbubxDcGNxvtxHA/6giBY4Gin+/hDIbyVJwDxoBrNWejv+JbVAqgrwPQU9OL4SqLhH8aPeMkdQTuI5Q6gsR8XuDTjSyQefx5lH1w5e8mly9RJO+XECEaYYjVwdbks21M46WLv/k5g08MNET5A2qQjQ11qYwwmGOeF17qfH7Eh70zqtpX2oSBpN8Fnh9ZFG/aUEY+lFckFbs2clKS4vQsEkkvbqrEI0HZVU="
   app: pushfight-api
-  run:
-    - "java -Xmx300m -jar server-web/target/pushfight-server-web-1.0-SNAPSHOT-jar.jar"
-    
