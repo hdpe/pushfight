@@ -8,6 +8,8 @@ enum class IllegalEventReason {
 
     UNAVAILABLE_PIECE,
 
+    OPPONENT_HALF,
+
     PIECES_NOT_PLACED,
 
     INCOMPLETE_SETUP,

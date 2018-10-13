@@ -5,7 +5,7 @@ import me.hdpe.pushfight.engine.Player
 
 interface PersistenceService {
 
-    fun createGame(playerAccountIds: Pair<String, String>,
+    fun createGame(createPlayerCommands: Pair<CreatePlayerCommand, CreatePlayerCommand>,
                    gameStateCreator: (players: Pair<Player, Player>) -> GameState): WebGame
 
     fun getGame(id: String): WebGame

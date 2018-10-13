@@ -7,6 +7,6 @@ class UpdatePlacementsRequest(
         playerNumber: Int?,
 
         @get:Valid
-        @get:NotNull(message = "{NotNull.UpdatePlacementsRequest.placements}")
+        @get:NotNull(message = "{NotNull.placements}")
         var placements: Array<UpdatedPlacement>?
 ) : AbstractPlayRequest(playerNumber)

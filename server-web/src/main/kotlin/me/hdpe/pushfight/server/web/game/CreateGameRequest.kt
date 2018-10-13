@@ -1,8 +1,8 @@
 package me.hdpe.pushfight.server.web.game
 
-import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotNull
 
 class CreateGameRequest(
-        @get:NotBlank
+        @get:NotNull(message = "{NotNull.opponent}")
         val opponent: String?
 )

@@ -3,7 +3,6 @@ package me.hdpe.pushfight.server.web
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.google.common.base.Charsets
-import me.hdpe.pushfight.engine.command.PieceType
 import me.hdpe.pushfight.server.web.game.*
 import me.hdpe.pushfight.server.web.token.TokenRequest
 import org.apache.commons.io.FileUtils
@@ -36,7 +35,7 @@ import java.io.File
 @TestPropertySource("classpath:/test-application.properties")
 class WriteApiExamples {
 
-    @Value("#{systemProperties['examples.dir']}")
+    @Value("#{systemProperties['examples.dir']?:'target/examples'}")
     private lateinit var examplesDir: File
 
     @Autowired
@@ -76,6 +75,11 @@ class WriteApiExamples {
         initialPlacements()
         updatePlacements()
         confirmSetup()
+
+        doPlayer2Setup()
+
+        doTurnMove()
+        doTurnPush()
     }
 
     private fun token() {
@@ -84,10 +88,12 @@ class WriteApiExamples {
         mockMvc.perform(post("/token").content(objectMapper.writeValueAsString(req))
                 .with(headers(content = true, authorised = false)))
                 .andExpect(status().isOk)
-                .andDo { result -> writeRequestBody("Example Request", "token", result) }
-                .andDo { result -> writeResponseBody("Example Response", "token", result) }
                 .andDo { result -> token = objectMapper.readValue(result.response.contentAsString,
                         ObjectNode::class.java)["token"].asText()}
+                .andDo { result -> writeRequestBody("Example Request", "token", result) }
+                .andDo { result -> writeResponseBody("Example Response", "token", result) }
+                .andDo { result -> write("Include Following Header in all Subsequent Requests:", "token", "subsequent-req",
+                        "Authorization: Bearer $token")}
     }
 
     private fun accounts() {
@@ -112,11 +118,11 @@ class WriteApiExamples {
 
     private fun initialPlacements() {
         val req = InitialPlacementsRequest(1, arrayOf(
-                InitialPlacement(PieceType.KING, 0, 3),
-                InitialPlacement(PieceType.PAWN, 1, 3),
-                InitialPlacement(PieceType.PAWN, 2, 3),
-                InitialPlacement(PieceType.KING, 3, 3),
-                InitialPlacement(PieceType.KING, 2, 4)
+                InitialPlacement("king", 0, 3),
+                InitialPlacement("pawn", 1, 3),
+                InitialPlacement("pawn", 2, 3),
+                InitialPlacement("king", 3, 3),
+                InitialPlacement("king", 2, 2)
         ))
 
         mockMvc.perform(post("/game/{gameId}/setup", gameId).content(objectMapper.writeValueAsString(req))
@@ -127,7 +133,7 @@ class WriteApiExamples {
     }
 
     private fun updatePlacements() {
-        val req = UpdatePlacementsRequest(1, arrayOf(UpdatedPlacement(2, 4, 1, 4)))
+        val req = UpdatePlacementsRequest(1, arrayOf(UpdatedPlacement(2, 2, 1, 2)))
 
         mockMvc.perform(patch("/game/{gameId}/setup", gameId).content(objectMapper.writeValueAsString(req))
                 .with(headers(content = true, authorised = true)))
@@ -146,8 +152,57 @@ class WriteApiExamples {
                 .andDo { result -> writeResponseBody("Example Response", "confirmSetup", result) }
     }
 
+    private fun doPlayer2Setup() {
+        val tokenReq = TokenRequest("testAccessKeyId2", "s3CrEt2")
+        var player2Token: String? = null
+
+        mockMvc.perform(post("/token").content(objectMapper.writeValueAsString(tokenReq))
+                .with(headers(content = true, authorised = false)))
+                .andExpect(status().isOk)
+                .andDo { result -> player2Token = objectMapper.readValue(result.response.contentAsString,
+                        ObjectNode::class.java)["token"].asText()}
+
+        val placementsReq = InitialPlacementsRequest(2, arrayOf(
+                InitialPlacement("king", 0, 4),
+                InitialPlacement("pawn", 1, 4),
+                InitialPlacement("pawn", 2, 4),
+                InitialPlacement("king", 3, 4),
+                InitialPlacement("king", 2, 5)
+        ))
+
+        mockMvc.perform(post("/game/{gameId}/setup", gameId).content(objectMapper.writeValueAsString(placementsReq))
+                .with(headers(content = true, authorised = true, token = player2Token)))
+                .andExpect(status().isOk)
+
+        val confirmReq = ConfirmSetupRequest(2)
+
+        mockMvc.perform(post("/game/{gameId}/setup/confirm", gameId).content(objectMapper.writeValueAsString(confirmReq))
+                .with(headers(content = true, authorised = true, token = player2Token)))
+                .andExpect(status().isOk)
+    }
+
+    private fun doTurnMove() {
+        val req = TurnRequest(1, 1, 2, 2, 2)
+
+        mockMvc.perform(post("/game/{gameId}/turn/move", gameId).content(objectMapper.writeValueAsString(req))
+                .with(headers(content = true, authorised = true)))
+                .andExpect(status().isOk)
+                .andDo { result -> writeRequestBody("Example Request", "move", result) }
+                .andDo { result -> writeResponseBody("Example Response", "move", result) }
+    }
+
+    private fun doTurnPush() {
+        val req = TurnRequest(1, 2, 2, 2, 3)
+
+        mockMvc.perform(post("/game/{gameId}/turn/push", gameId).content(objectMapper.writeValueAsString(req))
+                .with(headers(content = true, authorised = true)))
+                .andExpect(status().isOk)
+                .andDo { result -> writeRequestBody("Example Request", "push", result) }
+                .andDo { result -> writeResponseBody("Example Response", "push", result) }
+    }
+
     private fun writeRequestUri(title: String, operationId: String, result: MvcResult) {
-        write(title, operationId, "request", "GET " + basePath + result.request.requestURI +
+        write(title, operationId, "request", "GET " + (if (basePath != "/") basePath else "") + result.request.requestURI +
                 getQueryString(result))
     }
 
@@ -181,9 +236,10 @@ class WriteApiExamples {
         return qry.toString()
     }
 
-    private fun headers(content: Boolean = false, authorised: Boolean = false): RequestPostProcessor = RequestPostProcessor {
+    private fun headers(content: Boolean = false, authorised: Boolean = false,
+                        token: String? = null): RequestPostProcessor = RequestPostProcessor {
         if (authorised) {
-            it.addHeader("Authorization", "Bearer $token")
+            it.addHeader("Authorization", "Bearer ${token ?: this.token}")
         }
         it.addHeader("Accept", MediaType.APPLICATION_JSON_VALUE)
         if (content) {

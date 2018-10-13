@@ -19,6 +19,7 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
 
         verifyBoardSquare(placement.x, placement.y)
         verifyVacantSquare(placement.x, placement.y)
+        verifyOwnHalf(player, placement.x, placement.y)
         
         return applyInitialPlacement(player, placement)
     }
@@ -35,6 +36,7 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
 
         verifyBoardSquare(placement.newX, placement.newY)
         verifyVacantSquare(placement.newX, placement.newY)
+        verifyOwnHalf(player, placement.newX, placement.newY)
 
         return applyMove(placement.currentX, placement.currentY, placement.newX, placement.newY)
     }
@@ -124,6 +126,17 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
         }
     }
 
+    private fun verifyOwnHalf(player: Player, x: Int, y: Int) {
+        if (isOpponentPieceInHalf(player, y)) {
+            throw IllegalEventException(IllegalEventReason.OPPONENT_HALF, Coordinate(x, y),
+                    "square at ($x, $y) is in opponent's half")
+        }
+    }
+
+    private fun isOpponentPieceInHalf(player: Player, y: Int): Boolean {
+        return board.getSquaresInHalf(y).any { it.piece?.owner == getOpponent(player) }
+    }
+
     private fun verifyNoPiecesUnplaced(player: Player) {
         if (setup.isUnplacedPiecesRemaining(getPlayerNumber(player))) {
             throw IllegalEventException(IllegalEventReason.PIECES_NOT_PLACED, null, "not all pieces have been placed")
@@ -207,7 +220,7 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
     }
 
     private fun verifyNoPieceWithHatPreventingPush(startX: Int, startY: Int, xDelta: Int, yDelta: Int) {
-        forEachOccupiedSquareAffectedByPotentialPush(startX, startY, xDelta, yDelta)
+        board.forEachOccupiedSquareAffectedByPotentialPush(startX, startY, xDelta, yDelta)
         { square, x, y ->
             if (square.piece is King && square.piece.hatted) {
                 throw IllegalEventException(IllegalEventReason.HATTED_KING, Coordinate(x, y),
@@ -223,7 +236,7 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
         }
 
         var last: Triple<BoardSquare, Int, Int>? = null
-        forEachOccupiedSquareAffectedByPotentialPush(startX, startY, xDelta, yDelta) { square, x, y ->
+        board.forEachOccupiedSquareAffectedByPotentialPush(startX, startY, xDelta, yDelta) { square, x, y ->
             last = Triple(square, x, y)
         }
 
@@ -232,18 +245,6 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
         if (square.rail != Rail.NONE) {
             throw IllegalEventException(IllegalEventReason.RAIL_PREVENTING_PUSH, Coordinate(x, y),
                     "can't push: square at ($x, $y) has a rail")
-        }
-    }
-
-    private fun forEachOccupiedSquareAffectedByPotentialPush(startX: Int, startY: Int, xDelta: Int, yDelta: Int,
-                                                             action: (square: BoardSquare, x: Int, y: Int) -> Unit) {
-        var x = startX
-        var y = startY
-
-        while (board.isSquare(x, y) && !board.isVacant(x, y)) {
-            action(board.getSquare(x, y), x, y)
-            x += xDelta
-            y += yDelta
         }
     }
 
@@ -278,7 +279,7 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
         var movingPiece: Piece? = null
         var lastPushedCoord: Triple<BoardSquare, Int, Int>? = null
 
-        forEachOccupiedSquareAffectedByPotentialPush(startX, startY, xDelta, yDelta) { square, x, y ->
+        board.forEachOccupiedSquareAffectedByPotentialPush(startX, startY, xDelta, yDelta) { square, x, y ->
             updatedBoard = updatedBoard.withSquare(x, y, BoardSquare(movingPiece))
 
             movingPiece = square.piece

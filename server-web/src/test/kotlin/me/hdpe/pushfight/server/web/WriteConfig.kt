@@ -15,9 +15,9 @@ class WriteConfig {
     fun accountDetailsProvider(): AccountDetailsProvider {
         val provider = Mockito.mock(AccountDetailsProvider::class.java)
         Mockito.`when`(provider.accounts).thenReturn(listOf(
-                AccountDetails("1000", "Test User", "testAccessKeyId", "s3CrEt"),
-                AccountDetails("1001", "Potential Adversary 1", "_", "_"),
-                AccountDetails("1002", "Potential Adversary 2", "_", "_")
+                AccountDetails("1000", "You", "testAccessKeyId", "s3CrEt"),
+                AccountDetails("1001", "Adversary 1", "testAccessKeyId2", "s3CrEt2"),
+                AccountDetails("1002", "Adversary 2", "_", "_")
         ))
         return provider
     }

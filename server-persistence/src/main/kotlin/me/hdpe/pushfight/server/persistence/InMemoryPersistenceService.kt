@@ -8,9 +8,9 @@ class InMemoryPersistenceService : PersistenceService {
 
     private val games: MutableMap<String, WebGame> = mutableMapOf()
 
-    override fun createGame(playerAccountIds: Pair<String, String>,
+    override fun createGame(createPlayerCommands: Pair<CreatePlayerCommand, CreatePlayerCommand>,
                             gameStateCreator: (players: Pair<Player, Player>) -> GameState): WebGame {
-        val players = Pair(createWebPlayer(playerAccountIds.first), createWebPlayer(playerAccountIds.second))
+        val players = Pair(createWebPlayer(1, createPlayerCommands.first), createWebPlayer(2, createPlayerCommands.second))
 
         val game = createWebGame(players, gameStateCreator)
 
@@ -35,7 +35,8 @@ class InMemoryPersistenceService : PersistenceService {
 
     private fun createNoSuchGameException(id: String) = NoSuchGameException("no such game $id")
 
-    private fun createWebPlayer(accountId: String) = WebPlayer(UUID.randomUUID().toString(), accountId)
+    private fun createWebPlayer(number: Int, command: CreatePlayerCommand) =
+            WebPlayer(number, command.accountId, command.playerName)
 
     private fun createWebGame(players: Pair<WebPlayer, WebPlayer>,
                               gameStateCreator: (Pair<Player, Player>) -> GameState): WebGame {

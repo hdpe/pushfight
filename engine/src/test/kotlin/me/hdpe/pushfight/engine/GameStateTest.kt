@@ -3,12 +3,15 @@ package me.hdpe.pushfight.engine
 import me.hdpe.pushfight.engine.command.InitialPlacementCommand
 import me.hdpe.pushfight.engine.command.PieceType
 import me.hdpe.pushfight.engine.command.UpdatedPlacementCommand
-import org.hamcrest.*
+import org.hamcrest.Matcher
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.hobsoft.hamcrest.compose.ComposeMatchers.compose
 import org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.MethodSource
@@ -91,6 +94,21 @@ class GameStateTest {
         }
 
         @Test
+        fun `withInitialPlacements with square in opponent's half throws exception`() {
+            val state = GameState(config, newPlayer1Setup(listOf(Pawn(player1))), newTurn(),
+                    Board(arrayOf(
+                            squareArray(BoardSquare(newPiece(player2)), BoardSquare()),
+                            squareArray(BoardSquare(), BoardSquare())
+                    )))
+
+            val ex = assertThrows<IllegalEventException> { state.withInitialPlacements(player1,
+                    listOf(InitialPlacementCommand(PieceType.PAWN, 1, 0))) }
+
+            assertThat(ex, matchesIllegalEventException(IllegalEventReason.OPPONENT_HALF, Coordinate(1, 0),
+                    "square at (1, 0) is in opponent's half"))
+        }
+
+        @Test
         fun `withInitialPlacements with legal placements returns new GameState`() {
             val pieces = listOf(Pawn(player1), Pawn(player1), King(player1))
 
@@ -169,6 +187,21 @@ class GameStateTest {
 
             assertThat(ex, matchesIllegalEventException(IllegalEventReason.SQUARE_OCCUPIED, Coordinate(1, 0),
                     "square at (1, 0) is occupied"))
+        }
+
+        @Test
+        fun `withUpdatedPlacements with square in opponent's half throws exception`() {
+            val state = GameState(config, incompleteSetupForPlayer(player1), newTurn(),
+                    Board(arrayOf(
+                            squareArray(BoardSquare(newPiece(player2)), BoardSquare()),
+                            squareArray(BoardSquare(newPiece(player1)), BoardSquare())
+                    )))
+
+            val ex = assertThrows<IllegalEventException> { state.withUpdatedPlacements(player1,
+                    listOf(UpdatedPlacementCommand(0, 1, 1, 0))) }
+
+            assertThat(ex, matchesIllegalEventException(IllegalEventReason.OPPONENT_HALF, Coordinate(1, 0),
+                    "square at (1, 0) is in opponent's half"))
         }
 
         @Test

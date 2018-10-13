@@ -24,12 +24,12 @@ class WebJacksonModule : SimpleModule() {
     )
     abstract class PieceMixin {
 
-        @JsonSerialize(converter = PlayerToIdConverter::class)
+        @JsonSerialize(converter = PlayerToNumberConverter::class)
         abstract fun getOwner(): Player
     }
 
-    class PlayerToIdConverter : StdConverter<Player, String>() {
-        override fun convert(value: Player): String = (value as WebPlayer).id
+    class PlayerToNumberConverter : StdConverter<Player, Int>() {
+        override fun convert(value: Player): Int = (value as WebPlayer).number
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")

@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
 abstract class AbstractPlayRequest(
-        @get:NotNull(message = "{NotNull.AbstractPlayRequest.playerNumber}")
-        @get:Range(min = 1, max = 2, message = "{Range.AbstractPlayRequest.playerNumber}")
+        @get:NotNull(message = "{NotNull.playerNumber}")
+        @get:Range(min = 1, max = 2, message = "{Range.playerNumber}")
         var playerNumber: Int?
 )

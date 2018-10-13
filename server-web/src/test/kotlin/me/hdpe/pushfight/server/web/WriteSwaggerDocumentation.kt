@@ -4,23 +4,15 @@ import com.google.common.collect.ImmutableMap
 import io.github.swagger2markup.GroupBy
 import io.github.swagger2markup.Swagger2MarkupConverter
 import io.github.swagger2markup.builder.Swagger2MarkupConfigBuilder
-import me.hdpe.pushfight.server.web.accounts.AccountsConfig
-import me.hdpe.pushfight.server.web.game.GameConfig
-import me.hdpe.pushfight.server.web.security.AccountDetailsProvider
-import me.hdpe.pushfight.server.web.security.JwtTokenFactory
-import me.hdpe.pushfight.server.web.token.TokenConfig
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mockito.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.MediaType
-import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
@@ -31,7 +23,6 @@ import org.springframework.web.context.WebApplicationContext
 import java.io.File
 import java.nio.file.Paths
 import java.util.*
-import java.util.function.ToIntFunction
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(classes = [
@@ -71,7 +62,6 @@ class WriteSwaggerDocumentation {
         Swagger2MarkupConverter.from(swaggerJson)
                 .withConfig(Swagger2MarkupConfigBuilder(
                         ImmutableMap.of("swagger2markup.extensions.dynamicPaths.contentPath", examplesDir.absolutePath))
-                        .withBasePathPrefix()
                         .withTagOrdering(byLogical())
                         .withPathsGroupedBy(GroupBy.TAGS)
                         .build())

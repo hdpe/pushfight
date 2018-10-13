@@ -5,6 +5,7 @@ import me.hdpe.pushfight.engine.GameStateFactory
 import me.hdpe.pushfight.engine.Player
 import me.hdpe.pushfight.engine.command.InitialPlacementCommand
 import me.hdpe.pushfight.engine.command.UpdatedPlacementCommand
+import me.hdpe.pushfight.server.persistence.CreatePlayerCommand
 import me.hdpe.pushfight.server.persistence.PersistenceService
 import me.hdpe.pushfight.server.persistence.WebGame
 import me.hdpe.pushfight.server.web.security.AccountDetails
@@ -19,7 +20,8 @@ class GameService(val gameStateFactory: GameStateFactory, val accountDetailsProv
         val opponent = accountDetailsProvider.accounts.find { it.id == opponentId } ?:
                 throw BadPlayRequestException("no such account '$opponentId'")
 
-        val (principalAccountId, opponentAccountId) = arrayOf(principal, opponent).map { it.id }
+        val (principalAccountId, opponentAccountId) = arrayOf(principal, opponent).map {
+            CreatePlayerCommand(it.id, it.name) }
 
         return persistenceService.createGame(Pair(principalAccountId, opponentAccountId)) { (player1, player2) ->
             gameStateFactory.create(me.hdpe.pushfight.engine.GameConfig(player1, player2)) }
