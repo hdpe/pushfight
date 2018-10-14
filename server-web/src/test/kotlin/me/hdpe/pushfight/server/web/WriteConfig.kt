@@ -2,6 +2,8 @@ package me.hdpe.pushfight.server.web
 
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
+import me.hdpe.pushfight.server.persistence.InMemoryPersistenceService
+import me.hdpe.pushfight.server.persistence.PersistenceService
 import me.hdpe.pushfight.server.web.security.AccountDetails
 import me.hdpe.pushfight.server.web.security.AccountDetailsProvider
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
@@ -22,4 +24,7 @@ class WriteConfig {
             )
         }
     }
+
+    @Bean
+    fun webPersistence(): PersistenceService = InMemoryPersistenceService()
 }

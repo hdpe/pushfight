@@ -13,8 +13,5 @@ import org.springframework.context.annotation.Configuration
 class GameConfig {
 
     @Bean
-    fun webPersistence(): PersistenceService = InMemoryPersistenceService()
-
-    @Bean
     fun gameStateFactory(): GameStateFactory = GameStateFactory(BoardFactory(), SetupStateFactory())
 }

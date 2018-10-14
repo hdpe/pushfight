@@ -1,0 +1,39 @@
+#!/bin/bash
+set -e
+
+token=$(curl -sH "Content-Type: application/json" \
+	-d "{\"accessKeyId\":\"${PUSHFIGHT_ACCESS_KEY_ID}\",\"secret\":\"${PUSHFIGHT_SECRET}\"}" \
+	http://localhost:8080/token \
+		| jq -r '.token')
+
+game_id=$(curl -sH "Content-Type: application/json" -H "Authorization: Bearer $token" -d '{"opponent":2}' http://localhost:8080/game | jq -r '.id')
+
+initial_placements_request=$(cat <<EOF
+{
+  "playerNumber" : 1,
+  "placements" : [ {
+    "pieceType" : "king",
+    "x" : 0,
+    "y" : 3
+  }, {
+    "pieceType" : "pawn",
+    "x" : 1,
+    "y" : 3
+  }, {
+    "pieceType" : "pawn",
+    "x" : 2,
+    "y" : 3
+  }, {
+    "pieceType" : "king",
+    "x" : 3,
+    "y" : 3
+  }, {
+    "pieceType" : "king",
+    "x" : 2,
+    "y" : 2
+  } ]
+}
+EOF
+)
+
+curl -vH "Content-Type: application/json" -H "Authorization: Bearer $token" -d "${initial_placements_request}" http://localhost:8080/game/${game_id}/setup

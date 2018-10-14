@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: ryan at hdpe dot me
+      context: h2
+      changes:
+      - createTable:
+          tableName: games
+          columns:
+          - column:
+              name: id
+              type: varchar(36)
+              constraints:
+                primaryKey: true
+                nullable: false
+          - column:
+              name: state
+              type: varchar(100000)
+  - changeSet:
+      id: 1
+      author: ryan at hdpe dot me
+      context: postgres
+      changes:
+      - createTable:
+          tableName: games
+          columns:
+          - column:
+              name: id
+              type: text
+              constraints:
+                primaryKey: true
+                nullable: false
+          - column:
+              name: state
+              type: text

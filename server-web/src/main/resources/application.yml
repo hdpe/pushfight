@@ -1,9 +1,24 @@
+# Shared properties
+---
 spring:
   jackson:
     serialization:
       INDENT_OUTPUT: true
+  jpa:
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    contexts: h2
 
 pushfight:
   security:
     accounts: '[]'
     signing-key: ''
+
+# Production properties
+---
+
+spring:
+  profiles: production
+  liquibase:
+    contexts: postgres
