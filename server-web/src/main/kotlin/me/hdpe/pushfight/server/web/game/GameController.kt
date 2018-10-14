@@ -27,6 +27,15 @@ class GameController(val service: GameService) {
         return service.createGame(principal, request.opponent!!)
     }
 
+    @GetMapping("/{gameId}")
+    @ApiOperation(value = "Get Game", nickname = "getGame")
+    @AuthorizationHeaderRequired
+    @AuthenticationAndGameFoundRequiredRequestWithNoContentApiResponses
+    fun create(@AuthenticationPrincipal principal: AccountDetails,
+               @PathVariable("gameId") gameId: String): WebGame {
+        return service.getGame(principal, gameId)
+    }
+
     @PostMapping("/{gameId}/setup")
     @ApiOperation(value = "Put Initial Placements", nickname = "initialPlacements")
     @AuthorizationHeaderRequired
@@ -88,12 +97,4 @@ class GameController(val service: GameService) {
     fun handleIllegalEventException(response: HttpServletResponse) {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST)
     }
-
-    @ApiResponses(
-            ApiResponse(code = 400, message = "Bad request", response = WebSwaggerConfig.ErrorResponse::class),
-            ApiResponse(code = 401, message = "Not authorized", response = WebSwaggerConfig.ErrorResponse::class),
-            ApiResponse(code = 403, message = "Forbidden", response = WebSwaggerConfig.ErrorResponse::class),
-            ApiResponse(code = 404, message = "Game not found", response = WebSwaggerConfig.ErrorResponse::class)
-    )
-    annotation class AuthenticationAndGameFoundRequiredRequestWithContentApiResponses {}
 }

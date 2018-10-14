@@ -27,6 +27,10 @@ class GameService(val gameStateFactory: GameStateFactory, val accountDetailsProv
             gameStateFactory.create(me.hdpe.pushfight.engine.GameConfig(player1, player2)) }
     }
 
+    fun getGame(principal: AccountDetails, gameId: String): WebGame {
+        return persistenceService.getGame(gameId)
+    }
+
     fun putInitialPlacements(principal: AccountDetails, gameId: String, playerNumber: Int,
                              placements: List<InitialPlacement>): WebGame {
         return updateGame(principal, gameId, playerNumber) { state, player ->

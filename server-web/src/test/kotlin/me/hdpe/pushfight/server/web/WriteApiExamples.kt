@@ -72,6 +72,8 @@ class WriteApiExamples {
 
         createGame()
 
+        getGame()
+
         initialPlacements()
         updatePlacements()
         confirmSetup()
@@ -114,6 +116,14 @@ class WriteApiExamples {
                 .andDo { result -> writeResponseBody("Example Response", "createGame", result) }
                 .andDo { result -> gameId = objectMapper.readValue(result.response.contentAsString,
                         ObjectNode::class.java)["id"].asText()}
+    }
+
+    private fun getGame() {
+        mockMvc.perform(get("/game/{gameId}", gameId)
+                .with(headers(content = false, authorised = true)))
+                .andExpect(status().isOk)
+                .andDo { result -> writeRequestUri("Example Request", "getGame", result) }
+                .andDo { result -> writeResponseBody("Example Response", "getGame", result) }
     }
 
     private fun initialPlacements() {
@@ -224,7 +234,7 @@ class WriteApiExamples {
     }
 
     private fun getQueryString(result: MvcResult): String {
-        val qry = StringBuilder("?")
+        val qry = StringBuilder()
         for ((key, value1) in result.request.parameterMap) {
             for (value in value1) {
                 if (qry.isNotEmpty()) {
@@ -233,7 +243,7 @@ class WriteApiExamples {
                 qry.append(key).append("=").append(value)
             }
         }
-        return qry.toString()
+        return if (qry.length > 0) qry.insert(0, "?").toString() else ""
     }
 
     private fun headers(content: Boolean = false, authorised: Boolean = false,
