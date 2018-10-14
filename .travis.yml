@@ -2,4 +2,4 @@ language: java
 sudo: false
 install: true
 script: mvn -s config/maven/settings.xml clean verify
-after_success: mvn heroku:deploy
+after_success: sh -c 'cd server-web; mvn heroku:deploy-only'

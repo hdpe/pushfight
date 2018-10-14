@@ -16,6 +16,8 @@
 	<properties>
 		<asciidoctor.input.directory>${project.build.directory}/asciidoc/generated</asciidoctor.input.directory>
 		<asciidoctor.html.output.directory>${project.build.directory}/classes/static/docs</asciidoctor.html.output.directory>
+		
+		<deployArtifact>target/${project.artifactId}-${project.version}-jar.jar</deployArtifact>
 	</properties>
 	
 	<build>
@@ -63,10 +65,13 @@
 					<appName>pushfight-api</appName>
 					<includeTarget>false</includeTarget>
 					<processTypes>
-						<web>java -Xmx300m -jar target/${artifactId}-${version}-jar.jar --server.port=$PORT</web>
+						<web>java -Xmx300m -jar ${deployArtifact} --server.port=$PORT</web>
 					</processTypes>
+					<buildpacks>
+						<buildpack>heroku/jvm</buildpack>
+					</buildpacks>
 					<includes>
-						<include>target/${artifactId}-${version}-jar.jar</include>
+						<include>${deployArtifact}</include>
 					</includes>
 				</configuration>
 			</plugin>
