@@ -36,6 +36,19 @@ class Board(val squares: Array<Array<Square>>) {
         }
     }
 
+    fun getHattedKingSquareCoords(): Pair<Int, Int>? {
+        for (y in 0 until squares.size) {
+            for (x in 0 until squares[y].size) {
+                val square = squares[y][x]
+                if (square is BoardSquare && square.piece is King && square.piece.hatted) {
+                    return Pair(x, y)
+                }
+            }
+        }
+
+        return null
+    }
+
     private fun square(x: Int, y: Int): Square {
         return squares[y][x]
     }

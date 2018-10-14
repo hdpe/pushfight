@@ -2,12 +2,8 @@ package me.hdpe.pushfight.engine
 
 class TurnState(val number: Int = 1, val player: Player, val moves: Int = 0) {
 
-    fun withNumberIncremented(): TurnState {
-        return TurnState(number + 1, player, moves)
-    }
-
-    fun withPlayer(player: Player): TurnState {
-        return TurnState(number, player, moves)
+    fun next(player: Player, isPlayer2: Boolean): TurnState {
+        return TurnState(if (isPlayer2) number + 1 else number, player, 0)
     }
 
     fun withMovesIncremented(): TurnState {

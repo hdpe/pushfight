@@ -276,6 +276,13 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
     private fun applyPush(startX: Int, startY: Int, xDelta: Int, yDelta: Int): GameState {
         var updatedBoard = board
 
+        val hatCoords = board.getHattedKingSquareCoords()
+
+        if (hatCoords != null) {
+            updatedBoard = updatedBoard.withSquare(hatCoords.first, hatCoords.second,
+                    BoardSquare((board.getSquare(hatCoords.first, hatCoords.second).piece as King).withHat(false)))
+        }
+
         var movingPiece: Piece? = null
         var lastPushedCoord: Triple<BoardSquare, Int, Int>? = null
 
@@ -283,6 +290,11 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
             updatedBoard = updatedBoard.withSquare(x, y, BoardSquare(movingPiece))
 
             movingPiece = square.piece
+
+            if (x == startX && y == startY) {
+                movingPiece = (movingPiece as King).withHat()
+            }
+
             lastPushedCoord = Triple(square, x, y)
         }
 
@@ -299,12 +311,8 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
             victor = getOpponent(lastPushedSquare.piece!!.owner)
         }
 
-        var nextTurn = turn.withPlayer(getOpponent(turn.player))
-        if (turn.player == config.player2) {
-            nextTurn = nextTurn.withNumberIncremented()
-        }
-
-        return GameState(config, setup, nextTurn, updatedBoard, victor)
+        return GameState(config, setup,
+                turn.next(getOpponent(turn.player), isPlayer2 = (turn.player == config.player2)), updatedBoard, victor)
     }
 
     private fun getPlayerNumber(player: Player): Int {

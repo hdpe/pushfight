@@ -120,7 +120,7 @@ class GameStateTest {
                     InitialPlacementCommand(PieceType.PAWN, 1, 0)))
 
             assertThat(after, matchesGameState(config, matchesSetupWithPlayer1Unplaced(pieces[1]),
-                    squares = arrayOf(squareArray(BoardSquare(pieces[2]), BoardSquare(pieces[0])))))
+                    board = matchesBoard(arrayOf(squareArray(BoardSquare(pieces[2]), BoardSquare(pieces[0]))))))
         }
     }
 
@@ -214,8 +214,8 @@ class GameStateTest {
 
             val after = before.withUpdatedPlacements(player1, listOf(UpdatedPlacementCommand(0, 0, 2, 0)))
 
-            assertThat(after, matchesGameState(config, squares = arrayOf(
-                    squareArray(BoardSquare(), BoardSquare(piece2), BoardSquare(piece1))), turn = equalTo(turn)))
+            assertThat(after, matchesGameState(config, board = matchesBoard(arrayOf(
+                    squareArray(BoardSquare(), BoardSquare(piece2), BoardSquare(piece1)))), turn = equalTo(turn)))
         }
     }
 
@@ -259,7 +259,7 @@ class GameStateTest {
             val after = before.withSetupConfirmed(player1)
 
             assertThat(after, matchesGameState(config, matchesSetupWithPlayer1SetupComplete(),
-                    squares = arrayOf(squareArray(BoardSquare()))))
+                    board = matchesBoard(arrayOf(squareArray(BoardSquare())))))
         }
     }
 
@@ -408,10 +408,10 @@ class GameStateTest {
 
             assertThat(after, matchesGameState(config,
                     turn = matchesTurn(moves = equalTo(1)),
-                    squares = arrayOf(
+                    board = matchesBoard(arrayOf(
                         squareArray(AbyssSquare(), BoardSquare(pieceToMove)),
                         squareArray(BoardSquare(), BoardSquare())
-                    )
+                    ))
             ))
         }
 
@@ -553,52 +553,58 @@ class GameStateTest {
         }
 
         @Test
-        fun `withPush with legal, non-terminal push returns new GameState`() {
-            val pieceToMove = newKing(player1)
+        fun `withPush with legal push returns new GameState with board pieces as expected`() {
             val pieceToBePushed = newPiece()
             val before = GameState(config, completedSetup(), newTurn(player1),
-                    singleRowBoard(BoardSquare(pieceToMove), BoardSquare(pieceToBePushed), BoardSquare()))
+                    singleRowBoard(BoardSquare(newKing(player2, hatted = true)), BoardSquare(newKing(player1)),
+                            BoardSquare(pieceToBePushed), BoardSquare()))
 
-            val after = before.withPush(player1, 0, 0, 1, 0)
+            val after = before.withPush(player1, 1, 0, 2, 0)
 
-            assertThat(after, matchesGameState(config, squares = arrayOf(
-                    squareArray(BoardSquare(), BoardSquare(pieceToMove), BoardSquare(pieceToBePushed)))))
+            val squarePieces = after.board.squares[0].filterIsInstance<BoardSquare>().map { it.piece }
+
+            assertThat(squarePieces, contains(matchesKing(owner = player2, hatted = false), nullValue(),
+                    matchesKing(owner = player1, hatted = true), equalTo(pieceToBePushed)))
         }
 
         @Test
-        fun `withPush with legal, terminal push returns new GameState`() {
-            val pieceToMove = newKing(player1)
-            val pieceToBePushed1 = newPiece()
-            val pieceToBePushed2 = newPiece(player2)
+        fun `withPush with legal, non-terminal push returns new GameState with no victor`() {
             val before = GameState(config, completedSetup(), newTurn(player1),
-                    singleRowBoard(BoardSquare(pieceToMove), BoardSquare(pieceToBePushed1),
-                            BoardSquare(pieceToBePushed2)))
+                    singleRowBoard(BoardSquare(newKing(player1)), BoardSquare(newPiece()), BoardSquare()))
 
             val after = before.withPush(player1, 0, 0, 1, 0)
 
-            assertThat(after, matchesGameState(config, squares = arrayOf(
-                    squareArray(BoardSquare(), BoardSquare(pieceToMove), BoardSquare(pieceToBePushed1))),
-                    victor = player1))
+            assertThat(after, matchesGameState(config, victor = null))
+        }
+
+        @Test
+        fun `withPush with legal, terminal push returns new GameState with victor`() {
+            val before = GameState(config, completedSetup(), newTurn(player1),
+                    singleRowBoard(BoardSquare(newKing(player1)), BoardSquare(newPiece(player2))))
+
+            val after = before.withPush(player1, 0, 0, 1, 0)
+
+            assertThat(after, matchesGameState(config, victor = player1))
         }
 
         @Test
         fun `withPush with legal push for player 1 returns new GameState with next player's turn`() {
-            val before = GameState(config, completedSetup(), newTurn(player1, number = 1),
+            val before = GameState(config, completedSetup(), newTurn(player1, number = 1, moves = 1),
                     singleRowBoard(BoardSquare(King(player1)), BoardSquare(newPiece()), BoardSquare()))
 
             val after = before.withPush(player1, 0, 0, 1, 0)
 
-            assertThat(after.turn, matchesTurn(number = equalTo(1), player = equalTo(player2)))
+            assertThat(after.turn, matchesTurn(number = equalTo(1), moves = equalTo(0), player = equalTo(player2)))
         }
 
         @Test
         fun `withPush with legal push for player 2 returns new GameState with next player's turn`() {
-            val before = GameState(config, completedSetup(), newTurn(player2, number = 1),
+            val before = GameState(config, completedSetup(), newTurn(player2, number = 1, moves = 1),
                     singleRowBoard(BoardSquare(King(player2)), BoardSquare(newPiece()), BoardSquare()))
 
             val after = before.withPush(player2, 0, 0, 1, 0)
 
-            assertThat(after.turn, matchesTurn(number = equalTo(2), player = equalTo(player1)))
+            assertThat(after.turn, matchesTurn(number = equalTo(2), moves = equalTo(0), player = equalTo(player1)))
         }
     }
 
@@ -650,12 +656,13 @@ class GameStateTest {
 
     private fun matchesGameState(config: GameConfig, setup: Matcher<SetupState> = any(SetupState::class.java),
                                  turn: Matcher<TurnState> = any(TurnState::class.java),
-                                 squares: Array<Array<Square>>, victor: Player? = null): Matcher<GameState> {
+                                 board: Matcher<Board> = any(Board::class.java),
+                                 victor: Player? = null): Matcher<GameState> {
         return compose("a GameState with",
                 hasFeature("config", GameState::config, sameInstance(config)),
                 hasFeature("setup", GameState::setup, setup),
                 hasFeature("turn", GameState::turn, turn),
-                hasFeature("board", GameState::board, matchesBoard(squares)),
+                hasFeature("board", GameState::board, board),
                 hasFeature("victor", GameState::victor, equalTo(victor)))
     }
 
@@ -682,5 +689,9 @@ class GameStateTest {
 
     private fun matchesBoard(squares: Array<Array<Square>>): Matcher<Board> {
         return compose("a Board with", hasFeature("squares", Board::squares, Square2dArrayMatcher(squares)))
+    }
+
+    private fun matchesKing(owner: Player, hatted: Boolean): Matcher<Piece?> {
+        return allOf(isA(Piece::class.java), hasProperty("owner", equalTo(owner)), hasProperty("hatted", equalTo(hatted)))
     }
 }
