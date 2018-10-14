@@ -51,6 +51,11 @@ class WebSwaggerConfig : ServletContextAware {
                 .globalResponseMessage(RequestMethod.GET, mutableListOf(internalServerErrorResponse()))
                 .globalResponseMessage(RequestMethod.POST, mutableListOf(internalServerErrorResponse()))
                 .globalResponseMessage(RequestMethod.PATCH, mutableListOf(internalServerErrorResponse()))
+                .tags(
+                    Tag("Authentication", "APIs for managing a token, required to authenticate for all other endpoints."),
+                    Tag("Accounts", "APIs for retrieving other user accounts - for choosing an adversary."),
+                    Tag("Game", "Game APIs - for the execution of a duel of Pushfight.")
+                )
     }
 
     override fun setServletContext(servletContext: ServletContext) {
@@ -59,7 +64,7 @@ class WebSwaggerConfig : ServletContextAware {
 
     private fun apiInfo(): ApiInfo {
         return ApiInfo("Pushfight API",
-                "We're not scaremongering.", null, null,
+                "We're not scaremongering. This is really happening.", null, null,
                 contact(), null, null, emptyList<VendorExtension<*>>())
     }
 
