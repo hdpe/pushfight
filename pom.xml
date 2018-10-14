@@ -77,18 +77,6 @@
 		
 		<plugins>
 			<plugin>
-				<groupId>com.heroku.sdk</groupId>
-				<artifactId>heroku-maven-plugin</artifactId>
-				<configuration>
-					<appName>pushfight-api</appName>
-					<includeTarget>false</includeTarget>
-					<includes>
-						<include>server-web/target/${artifactId}-${version}-jar.jar</include>
-					</includes>
-				</configuration>
-			</plugin>
-			
-			<plugin>
 				<groupId>org.jetbrains.kotlin</groupId>
 				<artifactId>kotlin-maven-plugin</artifactId>
 				<executions>
