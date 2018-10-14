@@ -1,7 +1,8 @@
 package me.hdpe.pushfight.server.web.security
 
-import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
+import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.WebAttributes
@@ -16,15 +17,16 @@ class JwtAuthenticationFilter(val signingKeyProvider: JwtSigningKeyProvider,
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
         try {
             securityContextAccessor.context.authentication = attemptAuthentication(request)
+
+            filterChain.doFilter(request, response)
         }
         catch (exception: AuthenticationException) {
+            logger.info("authentication failed", exception)
+
             request.setAttribute(WebAttributes.AUTHENTICATION_EXCEPTION, exception)
 
             response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.reasonPhrase)
-            return
         }
-
-        filterChain.doFilter(request, response)
     }
 
     private fun attemptAuthentication(request: HttpServletRequest): JwtAuthenticationToken {
@@ -32,17 +34,22 @@ class JwtAuthenticationFilter(val signingKeyProvider: JwtSigningKeyProvider,
         val bearerPrefix = "Bearer "
 
         if (authorizationHeader == null || !authorizationHeader.startsWith(bearerPrefix)) {
-            throw JwtTokenMissingException("no Authorization header with Bearer")
+            throw InvalidJwtTokenException("no Authorization header with Bearer")
         }
 
-        val jwt = Jwts.parser()
-                .setSigningKey(signingKeyProvider.key)
-                .parseClaimsJws(authorizationHeader.substring(bearerPrefix.length))
+        try {
+            val jwt = Jwts.parser()
+                    .setSigningKey(signingKeyProvider.key)
+                    .parseClaimsJws(authorizationHeader.substring(bearerPrefix.length))
 
-        val claims = jwt.body
+            val claims = jwt.body
 
-        val player = AccountDetails(claims.subject, claims["name"] as String, "", null)
+            val player = AccountDetails(claims.subject, claims["name"] as String, "", null)
 
-        return JwtAuthenticationToken(player)
+            return JwtAuthenticationToken(player)
+        }
+        catch (ex: Exception) {
+            throw InvalidJwtTokenException("error parsing JWT token", ex)
+        }
     }
 }
