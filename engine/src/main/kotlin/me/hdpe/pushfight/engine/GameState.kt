@@ -276,7 +276,7 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
     private fun applyPush(startX: Int, startY: Int, xDelta: Int, yDelta: Int): GameState {
         var updatedBoard = board
 
-        val hatCoords = board.getHattedKingSquareCoords()
+        val hatCoords = board.coordsOfHattedKing()
 
         if (hatCoords != null) {
             updatedBoard = updatedBoard.withSquare(hatCoords.first, hatCoords.second,
