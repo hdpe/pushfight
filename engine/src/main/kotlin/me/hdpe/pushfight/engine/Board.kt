@@ -49,6 +49,78 @@ class Board(val squares: Array<Array<Square>>) {
         return null
     }
 
+    fun getImage(): String {
+        val yRange = 0 until squares.size
+        val xRange = 0 until squares[0].size
+
+        val buf = StringBuilder()
+        for (y in yRange) {
+            for (x in xRange) {
+                val square = squares[y][x]
+
+                val drawLeftEdge = square is BoardSquare || (x > 0 && squares[y][x - 1] is BoardSquare) ||
+                        (y > 0 && squares[y - 1][x] is BoardSquare)
+                val drawTopEdge = square is BoardSquare || (y > 0 && squares[y - 1][x] is BoardSquare)
+
+                buf.append(if (drawLeftEdge) "-" else " ")
+                        .append(if (drawTopEdge) "-" else " ")
+
+                if (x == xRange.last) {
+                    buf.append(if (drawTopEdge) "-" else " ")
+                }
+            }
+
+            buf.append("\n")
+
+            for (x in xRange) {
+                val square = squares[y][x]
+
+                val drawLeftEdge = square is BoardSquare || (x > 0 && squares[y][x - 1] is BoardSquare)
+
+                buf.append(if (drawLeftEdge) "|" else " ")
+                        .append(when (square) {
+                            is BoardSquare -> {
+                                val piece = square.piece
+                                when(piece) {
+                                    is Piece -> when {
+                                        piece.owner.number == 1 && piece is Pawn -> "○"
+                                        piece.owner.number == 1 && piece is King -> "□"
+                                        piece.owner.number == 2 && piece is Pawn -> "●"
+                                        else -> "■"
+                                    }
+                                    else -> " "
+                                }
+                            }
+                            else -> " "
+                        })
+
+                if (x == xRange.last) {
+                    buf.append(if (square is BoardSquare) "|" else " ")
+                }
+            }
+
+            buf.append("\n")
+
+            if (y == yRange.last) {
+                for (x in xRange) {
+                    val square = squares[y][x]
+
+                    val drawLeftEdge = square is BoardSquare || (x > 0 && squares[y][x - 1] is BoardSquare)
+                    val drawBottomEdge = square is BoardSquare
+
+                    buf.append(if (drawLeftEdge) "-" else " ")
+                            .append(if (drawBottomEdge) "-" else " ")
+
+                    if (x == xRange.last) {
+                        buf.append(if (drawBottomEdge) "-" else " ")
+                    }
+                }
+            }
+        }
+
+        return buf.toString()
+    }
+
     private fun square(x: Int, y: Int): Square {
         return squares[y][x]
     }

@@ -1,3 +1,5 @@
 package me.hdpe.pushfight.engine
 
-interface Player
+interface Player {
+    val number: Int
+}

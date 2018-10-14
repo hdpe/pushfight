@@ -23,8 +23,8 @@ class GameStateTest {
     val config: GameConfig
 
     init {
-        player1 = newPlayer()
-        player2 = newPlayer()
+        player1 = newPlayer(1)
+        player2 = newPlayer(2)
         config = GameConfig(player1, player2)
     }
 
@@ -638,7 +638,7 @@ class GameStateTest {
 
     private fun singleRowBoard(vararg squares: Square): Board = Board(arrayOf(squareArray(*squares)))
 
-    private fun newPlayer(): Player = object : Player {}
+    private fun newPlayer(number: Int = 1): Player = object : Player { override val number: Int get() = number }
 
     private fun newPiece(player: Player = player1): Piece = newPawn(player)
 

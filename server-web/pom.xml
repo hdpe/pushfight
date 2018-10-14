@@ -31,7 +31,6 @@
 						<runOrder>alphabetical</runOrder>
 						<test>WriteApiExamples, WriteSwaggerDocumentation</test>
 						<systemProperties>
-							<!--<spring.profiles.active>generate-docs</spring.profiles.active>-->
 							<examples.dir>${project.build.directory}/examples</examples.dir>
 						</systemProperties>
 					</configuration>
@@ -60,7 +59,6 @@
 			<plugin>
 				<groupId>org.asciidoctor</groupId>
 				<artifactId>asciidoctor-maven-plugin</artifactId>
-				<version>1.5.5</version>
 				<configuration>
 					<sourceDirectory>src/test/resources/asciidoc</sourceDirectory>
 					<sourceDocumentName>index.adoc</sourceDocumentName>
@@ -88,13 +86,6 @@
 						</configuration>
 					</execution>
 				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>org.jruby</groupId>
-						<artifactId>jruby-complete</artifactId>
-						<version>9.1.15.0</version>
-					</dependency>
-				</dependencies>
 			</plugin>
 			
 			<plugin>
@@ -131,6 +122,17 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-module-kotlin</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.nhaarman</groupId>
+			<artifactId>mockito-kotlin</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>io.github.microutils</groupId>
+			<artifactId>kotlin-logging</artifactId>
 		</dependency>
 		
 		<dependency>

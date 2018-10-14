@@ -43,7 +43,14 @@
 				<plugin>
 					<groupId>org.asciidoctor</groupId>
 					<artifactId>asciidoctor-maven-plugin</artifactId>
-					<version>1.5.7</version>
+					<version>1.5.5</version>
+					<dependencies>
+						<dependency>
+							<groupId>org.jruby</groupId>
+							<artifactId>jruby-complete</artifactId>
+							<version>9.1.15.0</version>
+						</dependency>
+					</dependencies>
 				</plugin>
 				
 				<plugin>
@@ -104,6 +111,18 @@
 				<groupId>me.hdpe.pushfight</groupId>
 				<artifactId>pushfight-server-web</artifactId>
 				<version>${project.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.nhaarman</groupId>
+				<artifactId>mockito-kotlin</artifactId>
+				<version>1.5.0</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>io.github.microutils</groupId>
+				<artifactId>kotlin-logging</artifactId>
+				<version>1.6.10</version>
 			</dependency>
 			
 			<dependency>
