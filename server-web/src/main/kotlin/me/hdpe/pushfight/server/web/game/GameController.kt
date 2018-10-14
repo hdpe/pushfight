@@ -31,8 +31,8 @@ class GameController(val service: GameService) {
     @ApiOperation(value = "Get Game", nickname = "getGame")
     @AuthorizationHeaderRequired
     @AuthenticationAndGameFoundRequiredRequestWithNoContentApiResponses
-    fun create(@AuthenticationPrincipal principal: AccountDetails,
-               @PathVariable("gameId") gameId: String): WebGame {
+    fun getGame(@AuthenticationPrincipal principal: AccountDetails,
+                @PathVariable("gameId") gameId: String): WebGame {
         return service.getGame(principal, gameId)
     }
 
