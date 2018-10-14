@@ -11,4 +11,6 @@ interface PersistenceService {
     fun getGame(id: String): WebGame
 
     fun updateGame(id: String, gameState: GameState): WebGame
+
+    fun getActiveGames(accountId: String): List<WebGame>
 }

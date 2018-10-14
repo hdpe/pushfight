@@ -59,6 +59,17 @@ class GameService(val gameStateFactory: GameStateFactory, val accountDetailsProv
             state.withPush(player, startX, startY, endX, endY) }
     }
 
+    fun getActiveGames(principal: AccountDetails): List<GameSummary> {
+        return persistenceService.getActiveGames(principal.id).map { game ->
+            val opponent = when (principal.id) {
+                game.player1AccountId -> game.player2AccountId
+                else -> game.player1AccountId
+            }
+
+            GameSummary(game.id, accountDetailsProvider.accounts.find { it.id == opponent }!!.name)
+        }
+    }
+
     private fun updateGame(principal: AccountDetails, gameId: String,
                            playerNumber: Int,
                            updateAction: (currentState: GameState, player: Player) -> GameState): WebGame {

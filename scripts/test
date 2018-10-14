@@ -3,10 +3,10 @@ set -e
 
 token=$(curl -sH "Content-Type: application/json" \
 	-d "{\"accessKeyId\":\"${PUSHFIGHT_ACCESS_KEY_ID}\",\"secret\":\"${PUSHFIGHT_SECRET}\"}" \
-	http://localhost:8080/token \
+	"${PUSHFIGHT_BASE_URL}/token" \
 		| jq -r '.token')
 
-game_id=$(curl -sH "Content-Type: application/json" -H "Authorization: Bearer $token" -d '{"opponent":2}' http://localhost:8080/game | jq -r '.id')
+game_id=$(curl -sH "Content-Type: application/json" -H "Authorization: Bearer $token" -d '{"opponent":2}' "${PUSHFIGHT_BASE_URL}/game" | jq -r '.id')
 
 initial_placements_request=$(cat <<EOF
 {
@@ -36,4 +36,4 @@ initial_placements_request=$(cat <<EOF
 EOF
 )
 
-curl -vH "Content-Type: application/json" -H "Authorization: Bearer $token" -d "${initial_placements_request}" http://localhost:8080/game/${game_id}/setup
+curl -vH "Content-Type: application/json" -H "Authorization: Bearer $token" -d "${initial_placements_request}" "${PUSHFIGHT_BASE_URL}/game/${game_id}/setup"

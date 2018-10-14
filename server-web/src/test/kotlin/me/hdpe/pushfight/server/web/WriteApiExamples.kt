@@ -82,6 +82,8 @@ class WriteApiExamples {
 
         doTurnMove()
         doTurnPush()
+
+        getActiveGames()
     }
 
     private fun token() {
@@ -209,6 +211,14 @@ class WriteApiExamples {
                 .andExpect(status().isOk)
                 .andDo { result -> writeRequestBody("Example Request", "push", result) }
                 .andDo { result -> writeResponseBody("Example Response", "push", result) }
+    }
+
+    private fun getActiveGames() {
+        mockMvc.perform(get("/games/active")
+                .with(headers(content = false, authorised = true)))
+                .andExpect(status().isOk)
+                .andDo { result -> writeRequestUri("Example Request", "getActiveGames", result) }
+                .andDo { result -> writeResponseBody("Example Response", "getActiveGames", result) }
     }
 
     private fun writeRequestUri(title: String, operationId: String, result: MvcResult) {

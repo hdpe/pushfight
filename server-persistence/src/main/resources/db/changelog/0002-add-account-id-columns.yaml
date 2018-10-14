@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: ryan at hdpe dot me
+      changes:
+      - delete:
+          tableName: games
+      - addColumn:
+          tableName: games
+          columns:
+          - column:
+              name: player1_account_id
+              type: varchar(36)
+              constraints:
+                nullable: false
+          - column:
+              name: player2_account_id
+              type: varchar(36)
+              constraints:
+                nullable: false
+          - column:
+              name: victor_account_id
+              type: varchar(36)

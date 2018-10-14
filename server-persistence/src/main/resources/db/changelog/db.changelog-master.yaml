@@ -2,3 +2,6 @@ databaseChangeLog:
   - include:
       file: 0001-create-initial-schema.yaml
       relativeToChangelogFile: true
+  - include:
+      file: 0002-add-account-id-columns.yaml
+      relativeToChangelogFile: true

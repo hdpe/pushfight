@@ -5,8 +5,8 @@ import me.hdpe.pushfight.engine.IllegalEventException
 import me.hdpe.pushfight.server.persistence.NoSuchGameException
 import me.hdpe.pushfight.server.persistence.WebGame
 import me.hdpe.pushfight.server.web.AuthenticationRequiredRequestWithContentApiResponses
+import me.hdpe.pushfight.server.web.AuthenticationRequiredRequestWithNoContentApiResponses
 import me.hdpe.pushfight.server.web.AuthorizationHeaderRequired
-import me.hdpe.pushfight.server.web.WebSwaggerConfig
 import me.hdpe.pushfight.server.web.security.AccountDetails
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*

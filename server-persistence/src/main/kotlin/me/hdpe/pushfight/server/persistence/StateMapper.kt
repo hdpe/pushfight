@@ -14,7 +14,6 @@ class StateMapper() {
 
     init {
         mapper.registerModules(KotlinModule(), PersistenceJacksonModule())
-                .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
     }
 

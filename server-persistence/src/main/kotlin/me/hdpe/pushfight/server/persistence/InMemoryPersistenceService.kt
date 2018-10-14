@@ -4,7 +4,7 @@ import me.hdpe.pushfight.engine.GameState
 import me.hdpe.pushfight.engine.Player
 import java.util.*
 
-class InMemoryPersistenceService : PersistenceService {
+class InMemoryPersistenceService : AbstractPersistenceService() {
 
     private val games: MutableMap<String, WebGame> = mutableMapOf()
 
@@ -28,18 +28,16 @@ class InMemoryPersistenceService : PersistenceService {
             throw createNoSuchGameException(id)
         }
 
-        val updated = WebGame(id, gameState)
+        val existing = games[id]!!
+
+        val updated = WebGame(id, existing.player1AccountId, existing.player2AccountId, gameState,
+                existing.victorAccountId)
         games[id] = updated
         return updated
     }
 
-    private fun createNoSuchGameException(id: String) = NoSuchGameException("no such game $id")
-
-    private fun createWebPlayer(number: Int, command: CreatePlayerCommand) =
-            WebPlayer(number, command.accountId, command.playerName)
-
-    private fun createWebGame(players: Pair<WebPlayer, WebPlayer>,
-                              gameStateCreator: (Pair<Player, Player>) -> GameState): WebGame {
-        return WebGame(UUID.randomUUID().toString(), gameStateCreator(players))
+    override fun getActiveGames(accountId: String): List<WebGame> {
+        return games.values.filter { arrayOf(it.player1AccountId, it.player2AccountId).contains(accountId) &&
+                it.victorAccountId == null }
     }
 }
