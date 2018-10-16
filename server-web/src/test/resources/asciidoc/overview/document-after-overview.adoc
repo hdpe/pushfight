@@ -1,0 +1,36 @@
+=== Source
+
+See https://github.com/hdpe/pushfight[Pushfight API @ *GitHub*].
+
+== Coordinates and Board Orientation
+
+Many of the endpoints described here take a coordinate (`x`, `y`, `newX`, `newY` etc.) to describe a location on the game board.
+
+The board is oriented with its longest dimension running top to bottom, with the side rails on the left and right.
+
+The origin `(0, 0)` is always defined as the _top left_ corner of the board. That is, the `x` value increases going across the board from left to right, while the `y` value increases going _down_ the length of the board.
+
+.Graphical Representation
+....
+
+      0   1   2   3
+        ---------
+ 0      |   |   |
+    -------------
+ 1  ‖   |   |   |
+    -----------------
+ 2  ‖   |   |   |   ‖
+    -----------------
+ 3  ‖ □ | ○ | □ | □ ‖
+    -----------------
+ 4  ‖ ■ | ● | ○ | ■ ‖
+    -----------------
+ 5  ‖   |   | ● |   ‖
+    -----------------
+ 6      |   | ■ |   ‖
+        -------------
+ 7      |   |   |
+        ---------
+....
+
+TIP: Coordinates on the grid corresponding to an actual square, e.g. `(0, 1)`, we refer to as _board_ squares; coordinates not corresponding to an actual square due to the irregular shape of the board, e.g. `(0, 0)`, we refer to as _abyss_ squares.

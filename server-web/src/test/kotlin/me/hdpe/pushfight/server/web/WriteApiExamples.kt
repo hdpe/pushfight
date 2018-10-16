@@ -96,8 +96,8 @@ class WriteApiExamples {
                         ObjectNode::class.java)["token"].asText()}
                 .andDo { result -> writeRequestBody("Example Request", "token", result) }
                 .andDo { result -> writeResponseBody("Example Response", "token", result) }
-                .andDo { _ -> write("Include Following Header in all Subsequent Requests:", "token", "subsequent-req",
-                        "Authorization: Bearer $token")}
+                .andDo { _ -> write("Example Authorization Header (for inclusion in all subsequent requests)",
+                        "token", "subsequent-req", "Authorization: Bearer $token")}
     }
 
     private fun accounts() {

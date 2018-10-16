@@ -61,12 +61,16 @@ class WriteSwaggerDocumentation {
     private fun writeAsciiDoc(swaggerJson: String) {
         Swagger2MarkupConverter.from(swaggerJson)
                 .withConfig(Swagger2MarkupConfigBuilder(
-                        ImmutableMap.of("swagger2markup.extensions.dynamicPaths.contentPath", examplesDir.absolutePath))
-                        .withTagOrdering(byLogical())
-                        .withPathsGroupedBy(GroupBy.TAGS)
-                        .build())
-                .build()
-                .toFolder(Paths.get("target/asciidoc/generated"))
+                        hashMapOf(
+                                Pair("swagger2markup.extensions.dynamicPaths.contentPath", examplesDir.absolutePath),
+                                Pair("swagger2markup.extensions.dynamicOverview.contentPath", "src/test/resources/asciidoc/overview")
+                        )
+                )
+                .withTagOrdering(byLogical())
+                .withPathsGroupedBy(GroupBy.TAGS)
+                .build())
+            .build()
+            .toFolder(Paths.get("target/asciidoc/generated"))
     }
 
     private fun byLogical(): Comparator<String> {
