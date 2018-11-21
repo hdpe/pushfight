@@ -41,7 +41,7 @@ class WebSecurityConfig(val authenticationProvider: AccessKeyAuthenticationProvi
     override fun configure(web: WebSecurity) {
         web
             .ignoring()
-                .antMatchers("/token", "/error", "/v2/api-docs", "/", "/docs", "/docs/**")
+                .antMatchers("/token", "/error", "/v2/api-docs", "/", "/docs", "/docs/**", "/favicon.ico")
     }
 
     private fun jwtAuthenticationFilter() = JwtAuthenticationFilter(signingKeyProvider, securityContextAccessor)
