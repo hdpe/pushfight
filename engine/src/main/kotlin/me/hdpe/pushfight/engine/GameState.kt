@@ -252,7 +252,7 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
         val pieceToPlace = setup.getUnplacedPiece(getPlayerNumber(player), placement.pieceType)
 
         val updatedSetup = setup.withPiecePlaced(getPlayerNumber(player), placement.pieceType)
-        val updatedBoard = board.withSquare(placement.x, placement.y, BoardSquare(pieceToPlace))
+        val updatedBoard = board.withSquareWithPiece(placement.x, placement.y, pieceToPlace)
 
         return GameState(config, updatedSetup, turn, updatedBoard)
     }
@@ -261,8 +261,8 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
         val movingPiece = board.getSquare(startX, startY).piece
 
         val updatedBoard = board
-                .withSquare(startX, startY, BoardSquare(null))
-                .withSquare(endX, endY, BoardSquare(movingPiece))
+                .withSquareWithPiece(startX, startY, null)
+                .withSquareWithPiece(endX, endY, movingPiece)
 
         val updatedTurn = if (incrementMoves) turn.withMovesIncremented() else turn
 
@@ -279,15 +279,15 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
         val hatCoords = board.coordsOfHattedKing()
 
         if (hatCoords != null) {
-            updatedBoard = updatedBoard.withSquare(hatCoords.first, hatCoords.second,
-                    BoardSquare((board.getSquare(hatCoords.first, hatCoords.second).piece as King).withHat(false)))
+            updatedBoard = updatedBoard.withSquareWithPiece(hatCoords.first, hatCoords.second,
+                    (board.getSquare(hatCoords.first, hatCoords.second).piece as King).withHat(false))
         }
 
         var movingPiece: Piece? = null
         var lastPushedCoord: Triple<BoardSquare, Int, Int>? = null
 
         board.forEachOccupiedSquareAffectedByPotentialPush(startX, startY, xDelta, yDelta) { square, x, y ->
-            updatedBoard = updatedBoard.withSquare(x, y, BoardSquare(movingPiece))
+            updatedBoard = updatedBoard.withSquareWithPiece(x, y, movingPiece)
 
             movingPiece = square.piece
 
@@ -305,7 +305,7 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
         var victor: Player? = null
 
         if (board.isSquare(finalX, finalY)) {
-            updatedBoard = updatedBoard.withSquare(finalX, finalY, BoardSquare(movingPiece))
+            updatedBoard = updatedBoard.withSquareWithPiece(finalX, finalY, movingPiece)
         } else {
             // victory!!
             victor = getOpponent(lastPushedSquare.piece!!.owner)

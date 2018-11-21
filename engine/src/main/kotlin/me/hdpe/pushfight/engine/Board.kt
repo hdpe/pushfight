@@ -18,9 +18,9 @@ class Board(val squares: Array<Array<Square>>) {
 
     fun isVacant(x: Int, y: Int) = getSquare(x, y).piece === null
 
-    fun withSquare(x: Int, y: Int, square: BoardSquare): Board {
+    fun withSquareWithPiece(x: Int, y: Int, piece: Piece?): Board {
         val newSquares = squares.map { it.copyOf() }.toTypedArray()
-        newSquares[y][x] = square
+        newSquares[y][x] = (squares[y][x] as BoardSquare).withPiece(piece)
         return Board(newSquares)
     }
 

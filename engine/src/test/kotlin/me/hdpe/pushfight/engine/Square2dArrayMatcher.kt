@@ -43,16 +43,29 @@ class Square2dArrayMatcher(val squares: Array<Array<Square>>) : TypeSafeDiagnosi
 
                 return when(square) {
                     is BoardSquare -> {
+                        var matched = true
+
                         val actualPiece = (item as BoardSquare).piece
-                        if (square.piece == actualPiece) {
-                            true
-                        } else {
+
+                        if (square.piece != actualPiece) {
                             mismatchDescription.appendText("expected piece: ")
                                     .appendValue(square.piece)
                                     .appendText(", was: ")
                                     .appendValue(actualPiece)
-                            false
+                            matched = false
                         }
+
+                        val actualRail = item.rail
+
+                        if (square.rail != actualRail) {
+                            mismatchDescription.appendText("expected rail: ")
+                                    .appendValue(square.rail)
+                                    .appendText(", was: ")
+                                    .appendValue(actualRail)
+                            matched = false
+                        }
+
+                        matched
                     }
                     else -> true
                 }
