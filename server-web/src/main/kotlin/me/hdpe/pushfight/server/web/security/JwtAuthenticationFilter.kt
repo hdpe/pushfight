@@ -1,8 +1,6 @@
 package me.hdpe.pushfight.server.web.security
 
 import io.jsonwebtoken.Jwts
-import mu.KotlinLogging
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.WebAttributes
@@ -44,7 +42,8 @@ class JwtAuthenticationFilter(val signingKeyProvider: JwtSigningKeyProvider,
 
             val claims = jwt.body
 
-            val player = AccountDetails(claims.subject, claims["name"] as String, "", null)
+            val player = ClientDetails(claims.subject, claims["name"] as String, "", null,
+                    claims["fixedAccountId"] as String?)
 
             return JwtAuthenticationToken(player)
         }

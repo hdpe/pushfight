@@ -7,11 +7,12 @@ import java.time.Clock
 @Service
 class JwtTokenFactory(val clock: Clock, val signingKeyProvider: JwtSigningKeyProvider) {
 
-    fun create(playerId: String, playerName: String): String {
+    fun create(clientDetails: ClientDetails): String {
 
         return Jwts.builder()
-                .setSubject(playerId)
-                .claim("name", playerName)
+                .setSubject(clientDetails.id)
+                .claim("name", clientDetails.name)
+                .claim("fixedAccountId", clientDetails.fixedAccountId)
                 .claim("exp", clock.instant().epochSecond + (60 * 60))
                 .signWith(signingKeyProvider.key)
                 .compact()

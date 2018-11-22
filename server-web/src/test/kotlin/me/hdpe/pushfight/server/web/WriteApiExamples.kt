@@ -109,7 +109,7 @@ class WriteApiExamples {
     }
 
     private fun createGame() {
-        val req = CreateGameRequest("1001")
+        val req = CreateGameRequest(opponent = "1001")
 
         mockMvc.perform(post("/game").content(objectMapper.writeValueAsString(req))
                 .with(headers(content = true, authorised = true)))

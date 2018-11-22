@@ -1,10 +1,11 @@
 package me.hdpe.pushfight.server.web.accounts
 
-import io.swagger.annotations.*
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
 import me.hdpe.pushfight.server.web.AuthenticationRequiredRequestWithNoContentApiResponses
 import me.hdpe.pushfight.server.web.AuthorizationHeaderRequired
-import me.hdpe.pushfight.server.web.security.AccountDetails
-import me.hdpe.pushfight.server.web.security.AccountDetailsProvider
+import me.hdpe.pushfight.server.web.security.ClientDetails
+import me.hdpe.pushfight.server.web.util.accountFromIdOrPrincipal
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
@@ -17,7 +18,9 @@ class AccountsController(val accountDetailsProvider: AccountDetailsProvider) {
     @ApiOperation(value = "Get Accounts", nickname = "accounts")
     @AuthorizationHeaderRequired
     @AuthenticationRequiredRequestWithNoContentApiResponses
-    fun accounts(@AuthenticationPrincipal principal: AccountDetails): List<AccountResult> =
-            accountDetailsProvider.accounts.asSequence()
-                    .filter { it.id != principal.id }.map { AccountResult(it.id, it.name) }.toList()
+    fun accounts(@AuthenticationPrincipal principal: ClientDetails, accountId: String?): List<AccountResult> {
+        val account = accountFromIdOrPrincipal(accountDetailsProvider, accountId, principal)
+
+        return accountDetailsProvider.accounts.asSequence()
+                .filter { it.id != account.id }.map { AccountResult(it.id, it.name) }.toList() }
 }

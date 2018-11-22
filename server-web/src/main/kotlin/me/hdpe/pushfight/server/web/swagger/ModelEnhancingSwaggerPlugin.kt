@@ -2,6 +2,7 @@ package me.hdpe.pushfight.server.web.swagger
 
 import com.fasterxml.classmate.TypeResolver
 import me.hdpe.pushfight.engine.Piece
+import me.hdpe.pushfight.engine.Player
 import me.hdpe.pushfight.engine.Square
 import org.springframework.stereotype.Component
 import springfox.documentation.builders.ModelPropertyBuilder
@@ -23,6 +24,21 @@ class ModelEnhancingSwaggerPlugin(val typeResolver: TypeResolver, val typeNameEx
         ModelBuilderPlugin, ModelPropertyBuilderPlugin {
 
     override fun apply(context: ModelContext) {
+        if (context.type == typeResolver.resolve(Player::class.java)) {
+            context.builder.properties(mapOf(
+                    Pair("accountId", toModelProperty(ModelPropertyBuilder()
+                            .name("accountId")
+                            .required(true)
+                            .type(typeResolver.resolve(java.lang.String::class.java)), context)
+                    ),
+                    Pair("playerName", toModelProperty(ModelPropertyBuilder()
+                            .name("playerName")
+                            .required(true)
+                            .type(typeResolver.resolve(java.lang.String::class.java)), context)
+                    )
+            ))
+        }
+
         if (context.type == typeResolver.resolve(Piece::class.java)) {
             context.builder.properties(mapOf(
                     Pair("type", toModelProperty(ModelPropertyBuilder()

@@ -5,9 +5,8 @@ import me.hdpe.pushfight.engine.IllegalEventException
 import me.hdpe.pushfight.server.persistence.NoSuchGameException
 import me.hdpe.pushfight.server.persistence.WebGame
 import me.hdpe.pushfight.server.web.AuthenticationRequiredRequestWithContentApiResponses
-import me.hdpe.pushfight.server.web.AuthenticationRequiredRequestWithNoContentApiResponses
 import me.hdpe.pushfight.server.web.AuthorizationHeaderRequired
-import me.hdpe.pushfight.server.web.security.AccountDetails
+import me.hdpe.pushfight.server.web.security.ClientDetails
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletResponse
@@ -22,16 +21,16 @@ class GameController(val service: GameService) {
     @ApiOperation(value = "Create Game", nickname = "createGame")
     @AuthorizationHeaderRequired
     @AuthenticationRequiredRequestWithContentApiResponses
-    fun create(@AuthenticationPrincipal principal: AccountDetails,
+    fun create(@AuthenticationPrincipal principal: ClientDetails,
                @Valid @RequestBody request: CreateGameRequest): WebGame {
-        return service.createGame(principal, request.opponent!!)
+        return service.createGame(principal, request.accountId, request.opponent!!)
     }
 
     @GetMapping("/{gameId}")
     @ApiOperation(value = "Get Game", nickname = "getGame")
     @AuthorizationHeaderRequired
     @AuthenticationAndGameFoundRequiredRequestWithNoContentApiResponses
-    fun getGame(@AuthenticationPrincipal principal: AccountDetails,
+    fun getGame(@AuthenticationPrincipal principal: ClientDetails,
                 @PathVariable("gameId") gameId: String): WebGame {
         return service.getGame(principal, gameId)
     }
@@ -40,7 +39,7 @@ class GameController(val service: GameService) {
     @ApiOperation(value = "Put Initial Placements", nickname = "initialPlacements")
     @AuthorizationHeaderRequired
     @AuthenticationAndGameFoundRequiredRequestWithContentApiResponses
-    fun initialPlacements(@AuthenticationPrincipal principal: AccountDetails,
+    fun initialPlacements(@AuthenticationPrincipal principal: ClientDetails,
                           @PathVariable("gameId") gameId: String,
                           @Valid @RequestBody request: InitialPlacementsRequest): WebGame {
         return service.putInitialPlacements(principal, gameId, request.playerNumber!!, request.placements!!.asList())
@@ -50,7 +49,7 @@ class GameController(val service: GameService) {
     @ApiOperation(value = "Update Initial Placements", nickname = "updatePlacements")
     @AuthorizationHeaderRequired
     @AuthenticationAndGameFoundRequiredRequestWithContentApiResponses
-    fun updatePlacements(@AuthenticationPrincipal principal: AccountDetails,
+    fun updatePlacements(@AuthenticationPrincipal principal: ClientDetails,
                          @PathVariable("gameId") gameId: String,
                          @Valid @RequestBody request: UpdatePlacementsRequest): WebGame {
         return service.putUpdatedPlacements(principal, gameId, request.playerNumber!!, request.placements!!.asList())
@@ -60,7 +59,7 @@ class GameController(val service: GameService) {
     @ApiOperation(value = "Confirm Setup", nickname = "confirmSetup")
     @AuthorizationHeaderRequired
     @AuthenticationAndGameFoundRequiredRequestWithContentApiResponses
-    fun confirmSetup(@AuthenticationPrincipal principal: AccountDetails,
+    fun confirmSetup(@AuthenticationPrincipal principal: ClientDetails,
                      @PathVariable("gameId") gameId: String,
                      @Valid @RequestBody request: ConfirmSetupRequest): WebGame {
         return service.putSetupConfirmation(principal, gameId, request.playerNumber!!)
@@ -70,7 +69,7 @@ class GameController(val service: GameService) {
     @ApiOperation(value = "Perform Move", nickname = "move")
     @AuthorizationHeaderRequired
     @AuthenticationAndGameFoundRequiredRequestWithContentApiResponses
-    fun move(@AuthenticationPrincipal principal: AccountDetails,
+    fun move(@AuthenticationPrincipal principal: ClientDetails,
              @PathVariable("gameId") gameId: String,
              @Valid @RequestBody request: TurnRequest): WebGame {
         return service.putMove(principal, gameId, request.playerNumber!!, request.startX!!, request.startY!!,
@@ -81,7 +80,7 @@ class GameController(val service: GameService) {
     @ApiOperation(value = "Perform Push", nickname = "push")
     @AuthorizationHeaderRequired
     @AuthenticationAndGameFoundRequiredRequestWithContentApiResponses
-    fun push(@AuthenticationPrincipal principal: AccountDetails,
+    fun push(@AuthenticationPrincipal principal: ClientDetails,
              @PathVariable("gameId") gameId: String,
              @Valid @RequestBody request: TurnRequest): WebGame {
         return service.putPush(principal, gameId, request.playerNumber!!, request.startX!!, request.startY!!,

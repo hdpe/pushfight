@@ -22,8 +22,8 @@ class TokenController(val tokenFactory: JwtTokenFactory, val authenticationManag
         val authentication = authenticationManager.authenticate(AccessKeyAuthenticationToken(request.accessKeyId!!,
                 request.secret!!)) as AccessKeyAuthenticationToken
 
-        val accountDetails = authentication.principal!!
+        val clientDetails = authentication.principal!!
 
-        return TokenResponse(tokenFactory.create(accountDetails.id, accountDetails.name))
+        return TokenResponse(tokenFactory.create(clientDetails))
     }
 }

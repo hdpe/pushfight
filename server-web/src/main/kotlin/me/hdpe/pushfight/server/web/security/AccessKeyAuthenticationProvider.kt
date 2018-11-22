@@ -6,14 +6,14 @@ import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
 
 @Service
-class AccessKeyAuthenticationProvider(val accountDetailsProvider: AccountDetailsProvider) : AuthenticationProvider {
+class AccessKeyAuthenticationProvider(val clientDetailsProvider: ClientDetailsProvider) : AuthenticationProvider {
 
     override fun authenticate(authentication: Authentication): Authentication? {
         if (authentication !is AccessKeyAuthenticationToken) {
             return null
         }
 
-        val principal: AccountDetails? = accountDetailsProvider.accounts.find {
+        val principal: ClientDetails? = clientDetailsProvider.clients.find {
             it.accessKeyId == authentication.accessKeyId && it.secret == authentication.secret }
                 ?: throw BadCredentialsException("Bad credentials")
 
