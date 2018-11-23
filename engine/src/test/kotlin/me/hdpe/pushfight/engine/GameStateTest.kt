@@ -94,6 +94,21 @@ class GameStateTest {
         }
 
         @Test
+        fun `withInitialPlacements with square not in own half throws exception`() {
+            val state = GameState(config, newPlayer1Setup(listOf(Pawn(player1))), newTurn(),
+                    Board(arrayOf(
+                            squareArray(BoardSquare(newPiece(player1))),
+                            squareArray(BoardSquare())
+                    )))
+
+            val ex = assertThrows<IllegalEventException> { state.withInitialPlacements(player1,
+                    listOf(InitialPlacementCommand(PieceType.PAWN, 0, 1))) }
+
+            assertThat(ex, matchesIllegalEventException(IllegalEventReason.OPPONENT_HALF, Coordinate(0, 1),
+                    "square at (0, 1) is in opponent's half"))
+        }
+
+        @Test
         fun `withInitialPlacements with square in opponent's half throws exception`() {
             val state = GameState(config, newPlayer1Setup(listOf(Pawn(player1))), newTurn(),
                     Board(arrayOf(
@@ -187,6 +202,21 @@ class GameStateTest {
 
             assertThat(ex, matchesIllegalEventException(IllegalEventReason.SQUARE_OCCUPIED, Coordinate(1, 0),
                     "square at (1, 0) is occupied"))
+        }
+
+        @Test
+        fun `withUpdatedPlacements with square not in own half throws exception`() {
+            val state = GameState(config, incompleteSetupForPlayer(player1), newTurn(),
+                    Board(arrayOf(
+                            squareArray(BoardSquare(newPiece(player1)), BoardSquare(newPiece(player1))),
+                            squareArray(BoardSquare(newPiece()), BoardSquare())
+                    )))
+
+            val ex = assertThrows<IllegalEventException> { state.withUpdatedPlacements(player1,
+                    listOf(UpdatedPlacementCommand(1, 0, 1, 1))) }
+
+            assertThat(ex, matchesIllegalEventException(IllegalEventReason.OPPONENT_HALF, Coordinate(1, 1),
+                    "square at (1, 1) is in opponent's half"))
         }
 
         @Test

@@ -127,14 +127,14 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
     }
 
     private fun verifyOwnHalf(player: Player, x: Int, y: Int) {
-        if (isOpponentPieceInHalf(player, y)) {
+        if (isPlayerPieceInHalf(getOpponent(player), y) || isPlayerPieceInHalf(player, y, oppositeHalf = true)) {
             throw IllegalEventException(IllegalEventReason.OPPONENT_HALF, Coordinate(x, y),
                     "square at ($x, $y) is in opponent's half")
         }
     }
 
-    private fun isOpponentPieceInHalf(player: Player, y: Int): Boolean {
-        return board.getSquaresInHalf(y).any { it.piece?.owner == getOpponent(player) }
+    private fun isPlayerPieceInHalf(player: Player, y: Int, oppositeHalf: Boolean = false): Boolean {
+        return board.getSquaresInHalf(y, oppositeHalf).any { it.piece?.owner == player }
     }
 
     private fun verifyNoPiecesUnplaced(player: Player) {

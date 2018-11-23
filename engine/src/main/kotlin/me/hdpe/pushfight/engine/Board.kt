@@ -10,8 +10,8 @@ class Board(val squares: Array<Array<Square>>) {
         return square(x, y) as BoardSquare
     }
 
-    fun getSquaresInHalf(y: Int): Array<BoardSquare> {
-        val yRange = if (y < squares.size / 2) 0 until squares.size / 2 else squares.size / 2 until squares.size - 1
+    fun getSquaresInHalf(y: Int, negate: Boolean = false): Array<BoardSquare> {
+        val yRange = if (y < squares.size / 2 != negate) 0 until squares.size / 2 else squares.size / 2 until squares.size - 1
 
         return squares.sliceArray(yRange).fold(arrayOf()) { acc, row -> acc + row.filterIsInstance<BoardSquare>() }
     }
