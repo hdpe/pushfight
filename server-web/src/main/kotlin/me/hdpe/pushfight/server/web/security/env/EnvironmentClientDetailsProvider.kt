@@ -10,5 +10,5 @@ import me.hdpe.pushfight.server.web.security.SecurityProperties
 class EnvironmentClientDetailsProvider(properties: SecurityProperties) : ClientDetailsProvider {
 
     override val clients: List<ClientDetails> = ObjectMapper().registerModule(KotlinModule())
-            .readValue(properties.clients)
+            .readValue(properties.clientsJson)
 }
