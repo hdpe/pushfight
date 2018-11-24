@@ -32,7 +32,7 @@ import java.util.*
 @TestPropertySource("classpath:/test-application.properties")
 class WriteSwaggerDocumentation {
 
-    @Value("#{systemProperties['examples.dir']}")
+    @Value("#{systemProperties['examples.dir']?:'target/examples'}")
     private lateinit var examplesDir: File
 
     @Autowired
