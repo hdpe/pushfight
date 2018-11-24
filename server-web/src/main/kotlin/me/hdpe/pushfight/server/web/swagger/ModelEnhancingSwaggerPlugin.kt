@@ -4,11 +4,14 @@ import com.fasterxml.classmate.TypeResolver
 import me.hdpe.pushfight.engine.Piece
 import me.hdpe.pushfight.engine.Player
 import me.hdpe.pushfight.engine.Square
+import me.hdpe.pushfight.server.persistence.WebGame
 import org.springframework.stereotype.Component
 import springfox.documentation.builders.ModelPropertyBuilder
 import springfox.documentation.schema.ModelProperty
 import springfox.documentation.schema.ResolvedTypes
 import springfox.documentation.schema.TypeNameExtractor
+import springfox.documentation.service.AllowableListValues
+import springfox.documentation.service.AllowableRangeValues
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spi.schema.ModelBuilderPlugin
 import springfox.documentation.spi.schema.ModelPropertyBuilderPlugin
@@ -24,6 +27,10 @@ class ModelEnhancingSwaggerPlugin(val typeResolver: TypeResolver, val typeNameEx
         ModelBuilderPlugin, ModelPropertyBuilderPlugin {
 
     override fun apply(context: ModelContext) {
+        if (context.type == typeResolver.resolve(WebGame::class.java)) {
+            context.builder.id("Game")
+        }
+
         if (context.type == typeResolver.resolve(Player::class.java)) {
             context.builder.properties(mapOf(
                     Pair("accountId", toModelProperty(ModelPropertyBuilder()
@@ -44,6 +51,7 @@ class ModelEnhancingSwaggerPlugin(val typeResolver: TypeResolver, val typeNameEx
                     Pair("type", toModelProperty(ModelPropertyBuilder()
                             .name("type")
                             .required(true)
+                            .allowableValues(AllowableListValues(listOf("king", "pawn"), null))
                             .type(typeResolver.resolve(java.lang.String::class.java)), context)
                     ),
                     Pair("hatted", toModelProperty(ModelPropertyBuilder()
@@ -58,10 +66,12 @@ class ModelEnhancingSwaggerPlugin(val typeResolver: TypeResolver, val typeNameEx
                     Pair("type", toModelProperty(ModelPropertyBuilder()
                             .name("type")
                             .required(true)
+                            .allowableValues(AllowableListValues(listOf("abyss", "board"), null))
                             .type(typeResolver.resolve(java.lang.String::class.java)), context)
                     ),
                     Pair("rail", toModelProperty(ModelPropertyBuilder()
                             .name("rail")
+                            .allowableValues(AllowableListValues(listOf("left", "right"), null))
                             .type(typeResolver.resolve(java.lang.String::class.java)), context)
                     ),
                     Pair("piece", toModelProperty(ModelPropertyBuilder()
@@ -76,6 +86,7 @@ class ModelEnhancingSwaggerPlugin(val typeResolver: TypeResolver, val typeNameEx
 
         if (propertyName == "owner") {
             context.builder.type(typeResolver.resolve(java.lang.Integer::class.java))
+                    .allowableValues(AllowableRangeValues("1", "2"))
         }
     }
 
