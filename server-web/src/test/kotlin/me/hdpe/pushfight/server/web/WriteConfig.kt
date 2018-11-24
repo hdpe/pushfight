@@ -20,9 +20,9 @@ class WriteConfig {
     fun accountDetailsProvider(): AccountDetailsProvider {
         return mock {
             on { accounts } doReturn listOf(
-                    AccountDetails("100", "You"),
-                    AccountDetails("101", "Adversary 1"),
-                    AccountDetails("102", "Adversary 2")
+                    AccountDetails("1000", "You"),
+                    AccountDetails("1001", "Adversary 1"),
+                    AccountDetails("1002", "Adversary 2")
             )
         }
     }
@@ -31,9 +31,8 @@ class WriteConfig {
     fun clientDetailsProvider(): ClientDetailsProvider {
         return mock {
             on { clients } doReturn listOf(
-                    ClientDetails("1000", "You", "testAccessKeyId", "s3CrEt", "100"),
-                    ClientDetails("1001", "Adversary 1", "testAccessKeyId2", "s3CrEt2", "101"),
-                    ClientDetails("1002", "Adversary 2", "_", "_", "102")
+                    ClientDetails("10000", "You API", "testAccessKeyId", "s3CrEt", "1000"),
+                    ClientDetails("10001", "Adversary 1 API", "testAccessKeyId2", "s3CrEt2", "1001")
             )
         }
     }

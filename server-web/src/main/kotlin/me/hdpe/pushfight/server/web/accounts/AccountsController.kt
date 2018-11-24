@@ -8,6 +8,7 @@ import me.hdpe.pushfight.server.web.security.ClientDetails
 import me.hdpe.pushfight.server.web.util.accountFromIdOrPrincipal
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -18,7 +19,8 @@ class AccountsController(val accountDetailsProvider: AccountDetailsProvider) {
     @ApiOperation(value = "Get Accounts", nickname = "accounts")
     @AuthorizationHeaderRequired
     @AuthenticationRequiredRequestWithNoContentApiResponses
-    fun accounts(@AuthenticationPrincipal principal: ClientDetails, accountId: String?): List<AccountResult> {
+    fun accounts(@AuthenticationPrincipal principal: ClientDetails,
+                 @RequestParam(value = "accountId", required = false) accountId: String?): List<AccountResult> {
         val account = accountFromIdOrPrincipal(accountDetailsProvider, accountId, principal)
 
         return accountDetailsProvider.accounts.asSequence()

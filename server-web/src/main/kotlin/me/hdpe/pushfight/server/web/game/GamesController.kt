@@ -21,7 +21,7 @@ class GamesController(val service: GameService) {
     @AuthorizationHeaderRequired
     @AuthenticationRequiredRequestWithNoContentApiResponses
     fun getActiveGames(@AuthenticationPrincipal principal: ClientDetails,
-                       @RequestParam("accountId") accountId: String): List<GameSummary> {
+                       @RequestParam(value = "accountId", required = false) accountId: String?): List<GameSummary> {
         return service.getActiveGames(principal, accountId)
     }
 }

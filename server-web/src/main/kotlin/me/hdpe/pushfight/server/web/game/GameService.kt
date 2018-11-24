@@ -62,7 +62,7 @@ class GameService(val gameStateFactory: GameStateFactory, val accountDetailsProv
             state.withPush(player, startX, startY, endX, endY) }
     }
 
-    fun getActiveGames(principal: ClientDetails, accountId: String): List<GameSummary> {
+    fun getActiveGames(principal: ClientDetails, accountId: String?): List<GameSummary> {
         val account = accountFromIdOrPrincipal(accountDetailsProvider, accountId, principal)
 
         return persistenceService.getActiveGames(account.id).map { game ->

@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Import
 
 @SpringBootConfiguration
 @EnableAutoConfiguration
-@Import(WebConfig::class, PersistenceConfig::class)
+@Import(WebConfig::class, EnvironmentConfig::class, PersistenceConfig::class)
 class Application
 
 fun main(args: Array<String>) {
