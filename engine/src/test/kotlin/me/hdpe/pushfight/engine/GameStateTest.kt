@@ -445,6 +445,48 @@ class GameStateTest {
             ))
         }
 
+        @ParameterizedTest
+        @CsvSource("0, 1, 0", "90, 0, 1", "180, -1, 0", "270, 0, -1")
+        fun `withMove considers moves legal regardless of move direction`(rotation: Int, deltaX: Int, deltaY: Int) {
+            val pieceToMove = newPiece(player1)
+
+            val (rotated, origin) = rotate(arrayOf(
+                    squareArray(BoardSquare(pieceToMove), BoardSquare()),
+                    squareArray(AbyssSquare(), AbyssSquare())
+            ), rotation)
+
+            val (originX, originY) = origin
+            val newX = originX + deltaX
+            val newY = originY + deltaY
+
+            val before = GameState(config, completedSetup(), newTurn(player1), Board(rotated))
+
+            val after = before.withMove(player1, originX, originY, newX, newY)
+
+            assertThat(after.board.getSquare(newX, newY).piece, isA(Piece::class.java))
+        }
+
+        private fun rotate(squares: Array<Array<Square>>, rotation: Int): Pair<Array<Array<Square>>, Pair<Int, Int>> {
+            val newSquares = (0..rotation / 90).fold(squares) { s, _ -> if (s === squares) s.copyOf() else rotate90(s) }
+            val newOrigin = getSquareCoordinates(squares[0][0], newSquares)
+
+            return Pair(newSquares, newOrigin)
+        }
+
+        private fun rotate90(squares: Array<Array<Square>>): Array<Array<Square>> =
+                Array(squares.size) { row -> Array(squares.size) { col -> squares[squares.size - col - 1][row] } }
+
+        private fun getSquareCoordinates(needle: Square, haystack: Array<Array<Square>>): Pair<Int, Int> {
+            return haystack
+                    .mapIndexed { y, row -> Pair(y, row) }
+                    .flatMap { (y, row) ->
+                        row.mapIndexed { x, sq -> Pair(x, sq) }
+                                .filter { (_, sq) -> sq === needle }
+                                .map { (x, _) -> Pair(x, y) }
+                    }
+                    .first()
+        }
+
         private fun players() = arrayOf(player1, player2)
     }
 

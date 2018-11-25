@@ -192,7 +192,7 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
     }
 
     private fun getVacantNeighbours(x: Int, y: Int): Array<Pair<Int, Int>> {
-        val candidateNeighbours = arrayOf(Pair(x - 1, y), Pair(x + 1, y), Pair(x, y - 1), Pair(y, y + 1))
+        val candidateNeighbours = arrayOf(Pair(x - 1, y), Pair(x + 1, y), Pair(x, y - 1), Pair(x, y + 1))
 
         return candidateNeighbours.filter { (nx, ny) -> board.isSquare(nx, ny) && board.isVacant(nx, ny) }.toTypedArray()
     }
