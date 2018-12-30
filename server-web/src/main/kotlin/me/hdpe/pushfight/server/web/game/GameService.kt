@@ -76,7 +76,13 @@ class GameService(val gameStateFactory: GameStateFactory, val accountService: Ac
                 else -> game.player1AccountId
             }
 
-            GameSummary(game.id, opponent, accountService.getActiveAccounts().find { it.id == opponent }!!.name)
+            GameSummary(
+                    game.id,
+                    opponent,
+                    accountService.getActiveAccounts().find { it.id == opponent }!!.name,
+                    game.gameState.turn,
+                    game.gameState.result
+            )
         }
     }
 
