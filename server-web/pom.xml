@@ -26,6 +26,11 @@
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<configuration>
+                        <includes>
+                            <include>WriteApiExamples</include>
+                            <include>WriteSwaggerDocumentation</include>
+                            <include>*Test</include>
+                        </includes>
 						<!-- We need WriteSwaggerDocumentation to run after WriteApiExamples -->
 						<runOrder>alphabetical</runOrder>
 						<systemProperties>
