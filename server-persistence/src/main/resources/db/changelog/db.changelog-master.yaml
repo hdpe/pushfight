@@ -5,3 +5,6 @@ databaseChangeLog:
   - include:
       file: 0002-add-account-id-columns.yaml
       relativeToChangelogFile: true
+  - include:
+      file: 0003-add-account-table.yaml
+      relativeToChangelogFile: true

@@ -1,11 +1,7 @@
 package me.hdpe.pushfight.server.web
 
-import com.nhaarman.mockito_kotlin.doReturn
+import com.nhaarman.mockito_kotlin.doAnswer
 import com.nhaarman.mockito_kotlin.mock
-import me.hdpe.pushfight.server.persistence.InMemoryPersistenceService
-import me.hdpe.pushfight.server.persistence.PersistenceService
-import me.hdpe.pushfight.server.web.accounts.AccountDetails
-import me.hdpe.pushfight.server.web.accounts.AccountDetailsProvider
 import me.hdpe.pushfight.server.web.security.ClientDetails
 import me.hdpe.pushfight.server.web.security.ClientDetailsProvider
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
@@ -17,26 +13,19 @@ import org.springframework.context.annotation.Configuration
 class WriteConfig {
 
     @Bean
-    fun accountDetailsProvider(): AccountDetailsProvider {
-        return mock {
-            on { accounts } doReturn listOf(
-                    AccountDetails("1000", "You"),
-                    AccountDetails("1001", "Adversary 1"),
-                    AccountDetails("1002", "Adversary 2")
-            )
-        }
+    fun writeState(): WriteState {
+        return WriteState()
     }
 
     @Bean
-    fun clientDetailsProvider(): ClientDetailsProvider {
+    fun clientDetailsProvider(writeState: WriteState): ClientDetailsProvider {
         return mock {
-            on { clients } doReturn listOf(
-                    ClientDetails("10000", "You API", "testAccessKeyId", "s3CrEt", "1000"),
-                    ClientDetails("10001", "Adversary 1 API", "testAccessKeyId2", "s3CrEt2", "1001")
-            )
+            on { clients } doAnswer {
+                listOf(
+                        ClientDetails("10000", "You API", "testAccessKeyId", "s3CrEt", writeState.accountIdsByName[ExampleAccountNames.YOU]),
+                        ClientDetails("10001", "Adversary 1 API", "testAccessKeyId2", "s3CrEt2")
+                )
+            }
         }
     }
-
-    @Bean
-    fun webPersistence(): PersistenceService = InMemoryPersistenceService()
 }

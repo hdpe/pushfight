@@ -5,26 +5,27 @@ import me.hdpe.pushfight.engine.GameStateFactory
 import me.hdpe.pushfight.engine.Player
 import me.hdpe.pushfight.engine.command.InitialPlacementCommand
 import me.hdpe.pushfight.engine.command.UpdatedPlacementCommand
-import me.hdpe.pushfight.server.persistence.CreatePlayerCommand
 import me.hdpe.pushfight.server.persistence.PersistenceService
-import me.hdpe.pushfight.server.persistence.WebGame
-import me.hdpe.pushfight.server.web.accounts.AccountDetailsProvider
+import me.hdpe.pushfight.server.persistence.game.CreatePlayerCommand
+import me.hdpe.pushfight.server.persistence.game.WebGame
+import me.hdpe.pushfight.server.web.accounts.AccountService
 import me.hdpe.pushfight.server.web.security.ClientDetails
 import me.hdpe.pushfight.server.web.util.accountFromId
 import me.hdpe.pushfight.server.web.util.accountFromIdOrPrincipal
 import org.springframework.stereotype.Service
 
 @Service
-class GameService(val gameStateFactory: GameStateFactory, val accountDetailsProvider: AccountDetailsProvider,
+class GameService(val gameStateFactory: GameStateFactory, val accountService: AccountService,
                   val persistenceService: PersistenceService) {
 
     fun createGame(principal: ClientDetails, accountId: String?, opponentId: String): WebGame {
-        val aggressor = accountFromIdOrPrincipal(accountDetailsProvider, accountId, principal)
+        val aggressor = accountFromIdOrPrincipal(accountService, accountId, principal)
 
-        val opponent = accountFromId(accountDetailsProvider, opponentId)
+        val opponent = accountFromId(accountService, opponentId)
 
         val (principalAccountId, opponentAccountId) = arrayOf(aggressor, opponent).map {
-            CreatePlayerCommand(it.id, it.name) }
+            CreatePlayerCommand(it.id, it.name)
+        }
 
         return persistenceService.createGame(Pair(principalAccountId, opponentAccountId)) { (player1, player2) ->
             gameStateFactory.create(me.hdpe.pushfight.engine.GameConfig(player1, player2)) }
@@ -63,7 +64,7 @@ class GameService(val gameStateFactory: GameStateFactory, val accountDetailsProv
     }
 
     fun getActiveGames(principal: ClientDetails, accountId: String?): List<GameSummary> {
-        val account = accountFromIdOrPrincipal(accountDetailsProvider, accountId, principal)
+        val account = accountFromIdOrPrincipal(accountService, accountId, principal)
 
         return persistenceService.getActiveGames(account.id).map { game ->
             val opponent = when (accountId) {
@@ -71,7 +72,7 @@ class GameService(val gameStateFactory: GameStateFactory, val accountDetailsProv
                 else -> game.player1AccountId
             }
 
-            GameSummary(game.id, accountDetailsProvider.accounts.find { it.id == opponent }!!.name)
+            GameSummary(game.id, opponent, accountService.getActiveAccounts().find { it.id == opponent }!!.name)
         }
     }
 

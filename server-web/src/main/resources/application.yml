@@ -9,10 +9,13 @@ spring:
       ddl-auto: none
   liquibase:
     contexts: h2
+  devtools:
+    livereload:
+      enabled: false
 
 pushfight:
   security:
-    accounts: '[]'
+    clients-json: '[]'
     signing-key: ''
 
 # Production properties

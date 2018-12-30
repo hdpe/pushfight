@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3
+      author: ryan at hdpe dot me
+      changes:
+      - createTable:
+          tableName: accounts
+          columns:
+          - column:
+              name: id
+              type: varchar(36)
+              constraints:
+                primaryKey: true
+                nullable: false
+          - column:
+              name: username
+              type: varchar(255)
+              constraints:
+                nullable: false
+      - addUniqueConstraint:
+          constraintName: uc_accounts_username
+          tableName: accounts
+          columnNames: username

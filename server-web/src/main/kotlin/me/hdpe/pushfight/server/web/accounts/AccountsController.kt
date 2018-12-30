@@ -8,21 +8,23 @@ import me.hdpe.pushfight.server.web.security.ClientDetails
 import me.hdpe.pushfight.server.web.util.accountFromIdOrPrincipal
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Api(tags = ["Accounts"])
-class AccountsController(val accountDetailsProvider: AccountDetailsProvider) {
+@RequestMapping("/accounts/opponents")
+class AccountsController(private val service: AccountService) {
 
-    @GetMapping("/accounts")
-    @ApiOperation(value = "Get Accounts", nickname = "accounts")
+    @GetMapping
+    @ApiOperation(value = "Get Available Opponents", nickname = "getAvailableOpponents")
     @AuthorizationHeaderRequired
     @AuthenticationRequiredRequestWithNoContentApiResponses
     fun accounts(@AuthenticationPrincipal principal: ClientDetails,
                  @RequestParam(value = "accountId", required = false) accountId: String?): List<AccountResult> {
-        val account = accountFromIdOrPrincipal(accountDetailsProvider, accountId, principal)
+        val account = accountFromIdOrPrincipal(service, accountId, principal)
 
-        return accountDetailsProvider.accounts.asSequence()
-                .filter { it.id != account.id }.map { AccountResult(it.id, it.name) }.toList() }
+        return service.getActiveAccounts().asSequence().filter { it.id != account.id }.toList()
+    }
 }

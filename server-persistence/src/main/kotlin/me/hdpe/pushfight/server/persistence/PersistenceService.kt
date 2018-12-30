@@ -1,16 +1,6 @@
 package me.hdpe.pushfight.server.persistence
 
-import me.hdpe.pushfight.engine.GameState
-import me.hdpe.pushfight.engine.Player
+import me.hdpe.pushfight.server.persistence.account.AccountPersistence
+import me.hdpe.pushfight.server.persistence.game.GamePersistence
 
-interface PersistenceService {
-
-    fun createGame(createPlayerCommands: Pair<CreatePlayerCommand, CreatePlayerCommand>,
-                   gameStateCreator: (players: Pair<Player, Player>) -> GameState): WebGame
-
-    fun getGame(id: String): WebGame
-
-    fun updateGame(id: String, gameState: GameState): WebGame
-
-    fun getActiveGames(accountId: String): List<WebGame>
-}
+interface PersistenceService : GamePersistence, AccountPersistence

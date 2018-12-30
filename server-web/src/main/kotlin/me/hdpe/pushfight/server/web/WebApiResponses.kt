@@ -17,6 +17,14 @@ annotation class AuthenticationEndpointRequestApiResponses {}
 annotation class AuthenticationRequiredRequestWithContentApiResponses {}
 
 @ApiResponses(
+        ApiResponse(code = 400, message = "Bad request", response = WebSwaggerConfig.ErrorResponse::class),
+        ApiResponse(code = 401, message = "Not authorized", response = WebSwaggerConfig.ErrorResponse::class),
+        ApiResponse(code = 403, message = "Forbidden", response = WebSwaggerConfig.ErrorResponse::class),
+        ApiResponse(code = 409, message = "Conflict", response = WebSwaggerConfig.ErrorResponse::class)
+)
+annotation class AuthenticationRequiredRequestWithContentApiResponsesAndConflict {}
+
+@ApiResponses(
         ApiResponse(code = 401, message = "Not authorized", response = WebSwaggerConfig.ErrorResponse::class),
         ApiResponse(code = 403, message = "Forbidden", response = WebSwaggerConfig.ErrorResponse::class)
 )

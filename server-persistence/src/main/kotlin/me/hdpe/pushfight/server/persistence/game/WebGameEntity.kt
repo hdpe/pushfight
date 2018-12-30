@@ -1,4 +1,4 @@
-package me.hdpe.pushfight.server.persistence
+package me.hdpe.pushfight.server.persistence.game
 
 import javax.persistence.Column
 import javax.persistence.Entity

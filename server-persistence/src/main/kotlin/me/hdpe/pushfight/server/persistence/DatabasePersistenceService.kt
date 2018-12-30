@@ -2,45 +2,38 @@ package me.hdpe.pushfight.server.persistence
 
 import me.hdpe.pushfight.engine.GameState
 import me.hdpe.pushfight.engine.Player
+import me.hdpe.pushfight.server.persistence.account.AccountDetails
+import me.hdpe.pushfight.server.persistence.account.AccountPersistence
+import me.hdpe.pushfight.server.persistence.account.CreateAccountCommand
+import me.hdpe.pushfight.server.persistence.game.CreatePlayerCommand
+import me.hdpe.pushfight.server.persistence.game.GamePersistence
+import me.hdpe.pushfight.server.persistence.game.WebGame
+import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-@Transactional
-class DatabasePersistenceService(val repository: WebGameRepository, val mapper: StateMapper) : AbstractPersistenceService() {
+@Service
+class DatabasePersistenceService(val gamePersistence: GamePersistence, val accountPersistence: AccountPersistence) :
+        PersistenceService {
 
+    override fun getAccount(username: String): AccountDetails = accountPersistence.getAccount(username)
+
+    @Transactional
     override fun createGame(createPlayerCommands: Pair<CreatePlayerCommand, CreatePlayerCommand>,
-                            gameStateCreator: (players: Pair<Player, Player>) -> GameState): WebGame {
-
-        val players = Pair(createWebPlayer(1, createPlayerCommands.first), createWebPlayer(2, createPlayerCommands.second))
-
-        val game = createWebGame(players, gameStateCreator)
-
-        repository.save(WebGameEntity(game.id, game.player1AccountId, game.player2AccountId,
-                mapper.serialize(game.gameState), game.victorAccountId))
-
-        return game
-    }
+                            gameStateCreator: (players: Pair<Player, Player>) -> GameState): WebGame =
+            gamePersistence.createGame(createPlayerCommands, gameStateCreator)
 
     @Transactional(readOnly = true)
-    override fun getGame(id: String): WebGame {
-        val entity = repository.findById(id).orElseThrow { createNoSuchGameException(id) }
+    override fun getGame(id: String): WebGame = gamePersistence.getGame(id)
 
-        return toWebGame(entity)
-    }
-
-    override fun updateGame(id: String, gameState: GameState): WebGame {
-        val entity = repository.findById(id).orElseThrow { createNoSuchGameException(id) }
-
-        entity.state = mapper.serialize(gameState)
-
-        return toWebGame(entity)
-    }
+    @Transactional
+    override fun updateGame(id: String, gameState: GameState): WebGame = gamePersistence.updateGame(id, gameState)
 
     @Transactional(readOnly = true)
-    override fun getActiveGames(accountId: String): List<WebGame> {
-        return repository.findAllActiveByAccountId(accountId).map { toWebGame(it) }
-    }
+    override fun getActiveGames(accountId: String): List<WebGame> = gamePersistence.getActiveGames(accountId)
 
-    private fun toWebGame(entity: WebGameEntity) =
-            WebGame(entity.id, entity.player1AccountId, entity.player2AccountId, mapper.deserialize(entity.state),
-                    entity.victorAccountId)
+    @Transactional
+    override fun createAccount(command: CreateAccountCommand): AccountDetails = accountPersistence.createAccount(command)
+
+    @Transactional(readOnly = true)
+    override fun getActiveAccounts(): List<AccountDetails> = accountPersistence.getActiveAccounts()
 }

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.util.StdConverter
 import me.hdpe.pushfight.engine.*
-import me.hdpe.pushfight.server.persistence.WebPlayer
+import me.hdpe.pushfight.server.persistence.game.WebPlayer
 
 class WebJacksonModule : SimpleModule() {
 

@@ -1,4 +1,4 @@
-package me.hdpe.pushfight.server.web.accounts;
+package me.hdpe.pushfight.server.persistence.account;
 
 class AccountDetails(val id: String, val name: String) {
 }

@@ -4,7 +4,6 @@ import com.fasterxml.classmate.TypeResolver
 import me.hdpe.pushfight.engine.Piece
 import me.hdpe.pushfight.engine.Player
 import me.hdpe.pushfight.engine.Square
-import me.hdpe.pushfight.server.persistence.WebGame
 import org.springframework.stereotype.Component
 import springfox.documentation.builders.ModelPropertyBuilder
 import springfox.documentation.schema.ModelProperty
@@ -27,10 +26,6 @@ class ModelEnhancingSwaggerPlugin(val typeResolver: TypeResolver, val typeNameEx
         ModelBuilderPlugin, ModelPropertyBuilderPlugin {
 
     override fun apply(context: ModelContext) {
-        if (context.type == typeResolver.resolve(WebGame::class.java)) {
-            context.builder.id("Game")
-        }
-
         if (context.type == typeResolver.resolve(Player::class.java)) {
             context.builder.properties(mapOf(
                     Pair("accountId", toModelProperty(ModelPropertyBuilder()

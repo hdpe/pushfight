@@ -1,4 +1,4 @@
-package me.hdpe.pushfight.server.persistence
+package me.hdpe.pushfight.server.persistence.game
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize

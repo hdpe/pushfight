@@ -3,6 +3,7 @@ package me.hdpe.pushfight.server.web
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.google.common.base.Charsets
+import me.hdpe.pushfight.server.web.accounts.CreateAccountRequest
 import me.hdpe.pushfight.server.web.game.*
 import me.hdpe.pushfight.server.web.token.TokenRequest
 import org.apache.commons.io.FileUtils
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.request.RequestPostProcessor
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
@@ -43,6 +45,9 @@ class WriteApiExamples {
 
     @Autowired
     private lateinit var objectMapper: ObjectMapper
+
+    @Autowired
+    private lateinit var writeState: WriteState
 
     private lateinit var mockMvc: MockMvc
 
@@ -68,7 +73,9 @@ class WriteApiExamples {
     fun writeApiExamples() {
         token()
 
-        accounts()
+        createAccounts()
+        getAccount()
+        getAvailableOpponents()
 
         createGame()
 
@@ -86,30 +93,76 @@ class WriteApiExamples {
         getActiveGames()
     }
 
-    private fun token() {
+    private fun token(writeExample: Boolean = true) {
         val req = TokenRequest("testAccessKeyId", "s3CrEt")
 
-        mockMvc.perform(post("/token").content(objectMapper.writeValueAsString(req))
+        val actions = mockMvc.perform(post("/token").content(objectMapper.writeValueAsString(req))
                 .with(headers(content = true, authorised = false)))
                 .andExpect(status().isOk)
                 .andDo { result -> token = objectMapper.readValue(result.response.contentAsString,
                         ObjectNode::class.java)["token"].asText()}
-                .andDo { result -> writeRequestBody("Example Request", "token", result) }
-                .andDo { result -> writeResponseBody("Example Response", "token", result) }
-                .andDo { _ -> write("Example Authorization Header (for inclusion in all subsequent requests)",
-                        "token", "subsequent-req", "Authorization: Bearer $token")}
+
+        if (writeExample) {
+            actions
+                    .andDo { result -> writeRequestBody("Example Request", "token", result) }
+                    .andDo { result -> writeResponseBody("Example Response", "token", result) }
+                    .andDo {
+                        write("Example Authorization Header (for inclusion in all subsequent requests)",
+                                "token", "subsequent-req", "Authorization: Bearer $token")
+                    }
+        }
     }
 
-    private fun accounts() {
-        mockMvc.perform(get("/accounts")
+    private fun createAccounts() {
+        writeState.accountIdsByName = ExampleAccountNames.ACCOUNTS
+                .mapIndexed { i, name -> Pair(name, createAccount(name, i == 0)) }
+                .associate { it }
+
+        // re-login, as we've altered the fixedAccountId for our client
+        token(writeExample = false)
+    }
+
+    private fun createAccount(username: String, writeExample: Boolean): String {
+        val req = CreateAccountRequest(username)
+
+        var actions = mockMvc.perform(post("/account").content(objectMapper.writeValueAsString(req))
+                .with(headers(content = true, authorised = true)))
+                .andExpect(status().isOk)
+
+        if (writeExample) {
+            actions = actions
+                    .andDo { result -> writeRequestBody("Example Request", "createAccount", result) }
+                    .andDo { result -> writeResponseBody("Example Response", "createAccount", result) }
+        }
+
+        var accountId: String? = null
+
+        actions.andDo { result ->
+            accountId = objectMapper.readValue(result.response.contentAsString,
+                    ObjectNode::class.java)["id"].asText()
+        }
+
+        return accountId!!
+    }
+
+    private fun getAccount() {
+        mockMvc.perform(get("/account").param("username", ExampleAccountNames.YOU)
                 .with(headers(content = false, authorised = true)))
                 .andExpect(status().isOk)
-                .andDo { result -> writeRequestUri("Example Request", "accounts", result) }
-                .andDo { result -> writeResponseBody("Example Response", "accounts", result) }
+                .andDo { result -> writeRequestUri("Example Request", "getAccount", result) }
+                .andDo { result -> writeResponseBody("Example Response", "getAccount", result) }
+    }
+
+    private fun getAvailableOpponents() {
+        mockMvc.perform(get("/accounts/opponents")
+                .with(headers(content = false, authorised = true)))
+                .andExpect(status().isOk)
+                .andDo { result -> writeRequestUri("Example Request", "getAvailableOpponents", result) }
+                .andDo { result -> writeResponseBody("Example Response", "getAvailableOpponents", result) }
     }
 
     private fun createGame() {
-        val req = CreateGameRequest(opponent = "1001")
+        val req = CreateGameRequest(opponent = writeState.accountIdsByName[ExampleAccountNames.ADVERSARY1])
 
         mockMvc.perform(post("/game").content(objectMapper.writeValueAsString(req))
                 .with(headers(content = true, authorised = true)))
