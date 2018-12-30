@@ -63,6 +63,10 @@ class GameService(val gameStateFactory: GameStateFactory, val accountService: Ac
             state.withPush(player, startX, startY, endX, endY) }
     }
 
+    fun resign(principal: ClientDetails, gameId: String, playerNumber: Int): WebGame {
+        return updateGame(principal, gameId, playerNumber) { state, player -> state.withResign(player) }
+    }
+
     fun getActiveGames(principal: ClientDetails, accountId: String?): List<GameSummary> {
         val account = accountFromIdOrPrincipal(accountService, accountId, principal)
 

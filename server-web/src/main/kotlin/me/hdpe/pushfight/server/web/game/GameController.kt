@@ -2,8 +2,8 @@ package me.hdpe.pushfight.server.web.game
 
 import io.swagger.annotations.*
 import me.hdpe.pushfight.engine.IllegalEventException
-import me.hdpe.pushfight.server.persistence.NoSuchGameException
-import me.hdpe.pushfight.server.persistence.WebGame
+import me.hdpe.pushfight.server.persistence.game.NoSuchGameException
+import me.hdpe.pushfight.server.persistence.game.WebGame
 import me.hdpe.pushfight.server.web.AuthenticationRequiredRequestWithContentApiResponses
 import me.hdpe.pushfight.server.web.AuthorizationHeaderRequired
 import me.hdpe.pushfight.server.web.security.ClientDetails
@@ -85,6 +85,15 @@ class GameController(val service: GameService) {
              @Valid @RequestBody request: TurnRequest): WebGame {
         return service.putPush(principal, gameId, request.playerNumber!!, request.startX!!, request.startY!!,
                 request.endX!!, request.endY!!)
+    }
+
+    @DeleteMapping("/{gameId}")
+    @ApiOperation(value = "Resign Game", nickname = "resign")
+    @AuthorizationHeaderRequired
+    @AuthenticationAndGameFoundRequiredRequestWithContentApiResponses
+    fun resign(@AuthenticationPrincipal principal: ClientDetails,
+               @PathVariable("gameId") gameId: String, @Valid @RequestBody request: ResignRequest): WebGame {
+        return service.resign(principal, gameId, request.playerNumber!!)
     }
 
     @ExceptionHandler(NoSuchGameException::class)

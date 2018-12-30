@@ -91,6 +91,8 @@ class WriteApiExamples {
         doTurnPush()
 
         getActiveGames()
+
+        resign()
     }
 
     private fun token(writeExample: Boolean = true) {
@@ -272,6 +274,16 @@ class WriteApiExamples {
                 .andExpect(status().isOk)
                 .andDo { result -> writeRequestUri("Example Request", "getActiveGames", result) }
                 .andDo { result -> writeResponseBody("Example Response", "getActiveGames", result) }
+    }
+
+    private fun resign() {
+        val req = ResignRequest(1)
+
+        mockMvc.perform(delete("/game/{gameId}", gameId).content(objectMapper.writeValueAsString(req))
+                .with(headers(content = true, authorised = true)))
+                .andExpect(status().isOk)
+                .andDo { result -> writeRequestBody("Example Request", "resign", result) }
+                .andDo { result -> writeResponseBody("Example Response", "resign", result) }
     }
 
     private fun writeRequestUri(title: String, operationId: String, result: MvcResult) {
