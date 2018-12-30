@@ -441,7 +441,8 @@ class GameStateTest {
                     board = matchesBoard(arrayOf(
                         squareArray(AbyssSquare(), BoardSquare(pieceToMove)),
                         squareArray(BoardSquare(), BoardSquare())
-                    ))
+                    )),
+                    victor = null
             ))
         }
 
@@ -465,6 +466,31 @@ class GameStateTest {
 
             assertThat(after.board.getSquare(newX, newY).piece, isA(Piece::class.java))
         }
+
+        @Test
+        fun `withMove with terminal move with possible subsequent push returns new GameState with no victor`() {
+            val before = GameState(config, completedSetup(), newTurn(player1, moves = 1),
+                    Board(arrayOf(squareArray(BoardSquare(newKing(player1)), BoardSquare(),
+                            BoardSquare(newPawn(player1))))))
+
+            val after = before.withMove(player1, 0, 0, 1, 0)
+
+            assertThat(after.victor, nullValue())
+        }
+
+        @ParameterizedTest
+        @MethodSource("terminalMoveFinalAdjacentSquares")
+        fun `withMove with terminal move with no possible subsequent push returns new GameState with opponent as victor`(finalSquare: Square) {
+            val before = GameState(config, completedSetup(), newTurn(player1, moves = 1),
+                    Board(arrayOf(squareArray(BoardSquare(newKing(player1)), BoardSquare(), finalSquare))))
+
+            val after = before.withMove(player1, 0, 0, 1, 0)
+
+            assertThat(after.victor, equalTo(player2))
+        }
+
+        private fun terminalMoveFinalAdjacentSquares(): Array<Square> =
+                arrayOf(AbyssSquare(), BoardSquare(newPawn(), Rail.RIGHT), BoardSquare(newKing(player1, hatted = true)))
 
         private fun rotate(squares: Array<Array<Square>>, rotation: Int): Pair<Array<Array<Square>>, Pair<Int, Int>> {
             val newSquares = (0..rotation / 90).fold(squares) { s, _ -> if (s === squares) s.copyOf() else rotate90(s) }

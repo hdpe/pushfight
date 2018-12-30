@@ -63,7 +63,7 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
 
         verifyVacantPath(startX, startY, endX, endY)
 
-        return applyMove(startX, startY, endX, endY, incrementMoves = true)
+        return applyMove(startX, startY, endX, endY, asMoveTurn = true)
     }
 
     fun withPush(player: Player, startX: Int, startY: Int, endX: Int, endY: Int): GameState {
@@ -191,10 +191,8 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
         return false
     }
 
-    private fun getVacantNeighbours(x: Int, y: Int): Array<Pair<Int, Int>> {
-        val candidateNeighbours = arrayOf(Pair(x - 1, y), Pair(x + 1, y), Pair(x, y - 1), Pair(x, y + 1))
-
-        return candidateNeighbours.filter { (nx, ny) -> board.isSquare(nx, ny) && board.isVacant(nx, ny) }.toTypedArray()
+    private fun getVacantNeighbours(x: Int, y: Int): List<Pair<Int, Int>> {
+        return board.getNeighbourCoords(x, y) { square -> square.piece == null }
     }
 
     private fun verifyKingPiece(x: Int, y: Int) {
@@ -257,16 +255,21 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
         return GameState(config, updatedSetup, turn, updatedBoard)
     }
 
-    private fun applyMove(startX: Int, startY: Int, endX: Int, endY: Int, incrementMoves: Boolean = false): GameState {
+    private fun applyMove(startX: Int, startY: Int, endX: Int, endY: Int, asMoveTurn: Boolean = false): GameState {
         val movingPiece = board.getSquare(startX, startY).piece
+        val player = movingPiece!!.owner
 
         val updatedBoard = board
                 .withSquareWithPiece(startX, startY, null)
                 .withSquareWithPiece(endX, endY, movingPiece)
 
-        val updatedTurn = if (incrementMoves) turn.withMovesIncremented() else turn
+        val updatedTurn = if (asMoveTurn) turn.withMovesIncremented() else turn
 
-        return GameState(config, setup, updatedTurn, updatedBoard)
+        // suicide
+        val suicide = asMoveTurn && updatedTurn.moves == 2 && !isPiecePushable(updatedBoard, player)
+        val victor = if (suicide) getOpponent(player) else null
+
+        return GameState(config, setup, updatedTurn, updatedBoard, victor)
     }
 
     private fun applySetupConfirmed(player: Player): GameState {
@@ -313,6 +316,43 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
 
         return GameState(config, setup,
                 turn.next(getOpponent(turn.player), isPlayer2 = (turn.player == config.player2)), updatedBoard, victor)
+    }
+
+    private fun isPiecePushable(board: Board, player: Player): Boolean {
+        // create a temporary state for the prospective board so we can call the methods affecting its internal
+        // board reference
+        val working = GameState(config, setup, turn, board)
+
+        return board.getBoardSquareCoords { square -> square.piece is King && square.piece.owner == player }
+                .any { (startX, startY) ->
+                    board.getNeighbourCoords(startX, startY) { square -> square.piece != null }
+                            .any { (endX, endY) ->
+                                val xDelta = endX - startX
+                                val yDelta = endY - startY
+
+                                val preventedByHat = ifIllegalEvent(IllegalEventReason.HATTED_KING) {
+                                    working.verifyNoPieceWithHatPreventingPush(startX, startY, xDelta, yDelta)
+                                }
+
+                                val preventedByRail = ifIllegalEvent(IllegalEventReason.RAIL_PREVENTING_PUSH) {
+                                    working.verifyNoRailPreventingPush(startX, startY, xDelta, yDelta)
+                                }
+
+                                !preventedByHat && !preventedByRail
+                            }
+                }
+    }
+
+    private fun ifIllegalEvent(reason: IllegalEventReason, action: () -> Unit): Boolean {
+        try {
+            action.invoke()
+        } catch (ex: IllegalEventException) {
+            if (ex.reason == reason) {
+                return true
+            }
+            throw ex
+        }
+        return false
     }
 
     private fun getPlayerNumber(player: Player): Int {

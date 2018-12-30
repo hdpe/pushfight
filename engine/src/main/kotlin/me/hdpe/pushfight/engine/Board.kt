@@ -36,17 +36,26 @@ class Board(val squares: Array<Array<Square>>) {
         }
     }
 
-    fun coordsOfHattedKing(): Pair<Int, Int>? {
-        for (y in 0 until squares.size) {
-            for (x in 0 until squares[y].size) {
-                val square = squares[y][x]
-                if (square is BoardSquare && square.piece is King && square.piece.hatted) {
-                    return Pair(x, y)
+    fun getBoardSquareCoords(predicate: (BoardSquare) -> Boolean): List<Pair<Int, Int>> {
+        return (0 until squares.size)
+                .flatMap { y ->
+                    (0 until squares[y].size)
+                            .filter { x ->
+                                val square = squares[y][x]
+                                square is BoardSquare && predicate.invoke(square)
+                            }
+                            .map { x -> Pair(x, y) }
                 }
-            }
-        }
+    }
 
-        return null
+    fun getNeighbourCoords(x: Int, y: Int, predicate: (BoardSquare) -> Boolean): List<Pair<Int, Int>> {
+        val candidateNeighbours = arrayOf(Pair(x - 1, y), Pair(x + 1, y), Pair(x, y - 1), Pair(x, y + 1))
+
+        return candidateNeighbours.filter { (nx, ny) -> isSquare(nx, ny) && predicate.invoke(getSquare(nx, ny)) }
+    }
+
+    fun coordsOfHattedKing(): Pair<Int, Int>? {
+        return getBoardSquareCoords { square -> square.piece is King && square.piece.hatted }.firstOrNull()
     }
 
     fun getImage(): String {
