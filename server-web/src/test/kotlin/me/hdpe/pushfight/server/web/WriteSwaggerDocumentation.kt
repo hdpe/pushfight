@@ -1,6 +1,5 @@
 package me.hdpe.pushfight.server.web
 
-import com.google.common.collect.ImmutableMap
 import io.github.swagger2markup.GroupBy
 import io.github.swagger2markup.Swagger2MarkupConverter
 import io.github.swagger2markup.builder.Swagger2MarkupConfigBuilder
