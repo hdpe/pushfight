@@ -706,6 +706,29 @@ class GameStateTest {
         }
     }
 
+    @Nested
+    @DisplayName("withResign")
+    inner class WithResignTest {
+
+        @Test
+        fun `withResign with game already ended throws exception`() {
+            val state = GameState(config, newSetup(), newTurn(), newBoard(), result = newResult())
+
+            val ex = assertThrows<IllegalEventException> { state.withResign(player1) }
+
+            assertThat(ex, matchesIllegalEventException(IllegalEventReason.GAME_ENDED, null, "game has already ended"))
+        }
+
+        @Test
+        fun `withResign returns new GameState with resignation set and opponent as victor`() {
+            val before = GameState(config, newSetup(), newTurn(), newBoard(), result = null)
+
+            val after = before.withResign(player1)
+
+            assertThat(after.result, matchesResultState(victor = equalTo(player2), resigned = equalTo(true)))
+        }
+    }
+
     private fun newSetup(): SetupState = completedSetup()
 
     private fun completedSetup(): SetupState {
@@ -798,8 +821,11 @@ class GameStateTest {
         return allOf(isA(Piece::class.java), hasProperty("owner", equalTo(owner)), hasProperty("hatted", equalTo(hatted)))
     }
 
-    private fun matchesResultState(victor: Matcher<Player>): Matcher<ResultState?> {
-        return compose("a ResultState with", hasFeature("victor", { it!!.victor }, victor));
+    private fun matchesResultState(victor: Matcher<Player> = any(Player::class.java),
+                                   resigned: Matcher<Boolean> = any(Boolean::class.java)): Matcher<ResultState?> {
+        return compose("a ResultState with",
+                hasFeature("victor", { it!!.victor }, victor),
+                hasFeature("resigned", { it!!.resigned }, resigned));
     }
 
     private fun matchesNullResultState() = nullValue(ResultState::class.java)

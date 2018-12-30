@@ -87,6 +87,12 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
         return applyPush(startX, startY, xDelta, yDelta)
     }
 
+    fun withResign(player: Player): GameState {
+        verifyGameInProgress()
+
+        return applyResign(player)
+    }
+
     private fun verifyGameInProgress() {
         if (result != null) {
             throw IllegalEventException(IllegalEventReason.GAME_ENDED, null, "game has already ended")
@@ -316,6 +322,10 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
 
         return GameState(config, setup,
                 turn.next(getOpponent(turn.player), isPlayer2 = (turn.player == config.player2)), updatedBoard, result)
+    }
+
+    private fun applyResign(player: Player): GameState {
+        return GameState(config, setup, turn, board, ResultState(getOpponent(player), true))
     }
 
     private fun isPiecePushable(board: Board, player: Player): Boolean {
