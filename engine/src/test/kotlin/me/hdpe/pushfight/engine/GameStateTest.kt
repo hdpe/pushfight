@@ -34,7 +34,7 @@ class GameStateTest {
 
         @Test
         fun `withInitialPlacements with game already ended throws exception`() {
-            val state = GameState(config, newSetup(), newTurn(), newBoard(), victor = newPlayer())
+            val state = GameState(config, newSetup(), newTurn(), newBoard(), result = newResult())
 
             val ex = assertThrows<IllegalEventException> { state.withInitialPlacements(player1, listOf()) }
 
@@ -145,7 +145,7 @@ class GameStateTest {
 
         @Test
         fun `withUpdatedPlacements with game already ended throws exception`() {
-            val state = GameState(config, newSetup(), newTurn(), newBoard(), victor = newPlayer())
+            val state = GameState(config, newSetup(), newTurn(), newBoard(), result = newResult())
 
             val ex = assertThrows<IllegalEventException> { state.withUpdatedPlacements(player1, listOf()) }
 
@@ -255,7 +255,7 @@ class GameStateTest {
 
         @Test
         fun `withSetupConfirmed with game already ended throws exception`() {
-            val state = GameState(config, newSetup(), newTurn(), newBoard(), victor = newPlayer())
+            val state = GameState(config, newSetup(), newTurn(), newBoard(), result = newResult())
 
             val ex = assertThrows<IllegalEventException> { state.withSetupConfirmed(player1) }
 
@@ -299,7 +299,7 @@ class GameStateTest {
 
         @Test
         fun `withMove with game already ended throws exception`() {
-            val state = GameState(config, newSetup(), newTurn(), newBoard(), victor = newPlayer())
+            val state = GameState(config, newSetup(), newTurn(), newBoard(), result = newResult())
 
             val ex = assertThrows<IllegalEventException> { state.withMove(player1, 0, 0, 1, 0) }
 
@@ -442,7 +442,7 @@ class GameStateTest {
                         squareArray(AbyssSquare(), BoardSquare(pieceToMove)),
                         squareArray(BoardSquare(), BoardSquare())
                     )),
-                    victor = null
+                    result = matchesNullResultState()
             ))
         }
 
@@ -468,14 +468,14 @@ class GameStateTest {
         }
 
         @Test
-        fun `withMove with terminal move with possible subsequent push returns new GameState with no victor`() {
+        fun `withMove with terminal move with possible subsequent push returns new GameState with no result`() {
             val before = GameState(config, completedSetup(), newTurn(player1, moves = 1),
                     Board(arrayOf(squareArray(BoardSquare(newKing(player1)), BoardSquare(),
                             BoardSquare(newPawn(player1))))))
 
             val after = before.withMove(player1, 0, 0, 1, 0)
 
-            assertThat(after.victor, nullValue())
+            assertThat(after.result, nullValue())
         }
 
         @ParameterizedTest
@@ -486,7 +486,7 @@ class GameStateTest {
 
             val after = before.withMove(player1, 0, 0, 1, 0)
 
-            assertThat(after.victor, equalTo(player2))
+            assertThat(after.result, matchesResultState(victor = equalTo(player2)))
         }
 
         private fun terminalMoveFinalAdjacentSquares(): Array<Square> =
@@ -522,7 +522,7 @@ class GameStateTest {
 
         @Test
         fun `withPush with game already ended throws exception`() {
-            val state = GameState(config, newSetup(), newTurn(), newBoard(), victor = newPlayer())
+            val state = GameState(config, newSetup(), newTurn(), newBoard(), result = newResult())
 
             val ex = assertThrows<IllegalEventException> { state.withPush(player1, 0, 0, 1, 0) }
 
@@ -672,7 +672,7 @@ class GameStateTest {
 
             val after = before.withPush(player1, 0, 0, 1, 0)
 
-            assertThat(after, matchesGameState(config, victor = null))
+            assertThat(after, matchesGameState(config, result = matchesNullResultState()))
         }
 
         @Test
@@ -682,7 +682,7 @@ class GameStateTest {
 
             val after = before.withPush(player1, 0, 0, 1, 0)
 
-            assertThat(after, matchesGameState(config, victor = player1))
+            assertThat(after, matchesGameState(config, result = matchesResultState(equalTo(player1))))
         }
 
         @Test
@@ -744,6 +744,10 @@ class GameStateTest {
 
     private fun newKing(player: Player = player1, hatted: Boolean = false): Piece = King(player, hatted)
 
+    private fun newResult(victor: Player = player1): ResultState {
+        return ResultState(victor)
+    }
+
     private fun matchesIllegalEventException(reason: IllegalEventReason, coord: Coordinate?, message: String):
             Matcher<IllegalEventException> {
         return compose("an IllegalEventException with",
@@ -755,13 +759,13 @@ class GameStateTest {
     private fun matchesGameState(config: GameConfig, setup: Matcher<SetupState> = any(SetupState::class.java),
                                  turn: Matcher<TurnState> = any(TurnState::class.java),
                                  board: Matcher<Board> = any(Board::class.java),
-                                 victor: Player? = null): Matcher<GameState> {
+                                 result: Matcher<ResultState?> = anyOf(any(ResultState::class.java), nullValue())): Matcher<GameState> {
         return compose("a GameState with",
                 hasFeature("config", GameState::config, sameInstance(config)),
                 hasFeature("setup", GameState::setup, setup),
                 hasFeature("turn", GameState::turn, turn),
                 hasFeature("board", GameState::board, board),
-                hasFeature("victor", GameState::victor, equalTo(victor)))
+                hasFeature("result", { it.result }, result));
     }
 
     private fun matchesSetupWithPlayer1Unplaced(vararg unplaced: Piece): Matcher<SetupState> {
@@ -792,4 +796,10 @@ class GameStateTest {
     private fun matchesKing(owner: Player, hatted: Boolean): Matcher<Piece?> {
         return allOf(isA(Piece::class.java), hasProperty("owner", equalTo(owner)), hasProperty("hatted", equalTo(hatted)))
     }
+
+    private fun matchesResultState(victor: Matcher<Player>): Matcher<ResultState?> {
+        return compose("a ResultState with", hasFeature("victor", { it!!.victor }, victor));
+    }
+
+    private fun matchesNullResultState() = nullValue(ResultState::class.java)
 }

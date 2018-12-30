@@ -5,7 +5,7 @@ import me.hdpe.pushfight.engine.command.PieceType
 import me.hdpe.pushfight.engine.command.UpdatedPlacementCommand
 
 class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnState, val board: Board,
-                val victor: Player? = null) {
+                val result: ResultState? = null) {
 
     fun withInitialPlacements(player: Player, placements: List<InitialPlacementCommand>): GameState {
         verifyGameInProgress()
@@ -88,7 +88,7 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
     }
 
     private fun verifyGameInProgress() {
-        if (victor != null) {
+        if (result != null) {
             throw IllegalEventException(IllegalEventReason.GAME_ENDED, null, "game has already ended")
         }
     }
@@ -267,9 +267,9 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
 
         // suicide
         val suicide = asMoveTurn && updatedTurn.moves == 2 && !isPiecePushable(updatedBoard, player)
-        val victor = if (suicide) getOpponent(player) else null
+        val result = if (suicide) ResultState(getOpponent(player)) else null
 
-        return GameState(config, setup, updatedTurn, updatedBoard, victor)
+        return GameState(config, setup, updatedTurn, updatedBoard, result)
     }
 
     private fun applySetupConfirmed(player: Player): GameState {
@@ -305,17 +305,17 @@ class GameState(val config: GameConfig, val setup: SetupState, val turn: TurnSta
         val finalX = lastPushedX + xDelta
         val finalY = lastPushedY + yDelta
 
-        var victor: Player? = null
+        var result: ResultState? = null
 
         if (board.isSquare(finalX, finalY)) {
             updatedBoard = updatedBoard.withSquareWithPiece(finalX, finalY, movingPiece)
         } else {
             // victory!!
-            victor = getOpponent(lastPushedSquare.piece!!.owner)
+            result = ResultState(getOpponent(lastPushedSquare.piece!!.owner))
         }
 
         return GameState(config, setup,
-                turn.next(getOpponent(turn.player), isPlayer2 = (turn.player == config.player2)), updatedBoard, victor)
+                turn.next(getOpponent(turn.player), isPlayer2 = (turn.player == config.player2)), updatedBoard, result)
     }
 
     private fun isPiecePushable(board: Board, player: Player): Boolean {
