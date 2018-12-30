@@ -40,7 +40,7 @@ class WebSwaggerConfig : ServletContextAware {
     fun docket(): Docket {
         return Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
-                .host("pushfight-app.herokuapp.com")
+                .host("pushfight-api.herokuapp.com")
                 .additionalModels(typeResolver.resolve(WebSwaggerConfig.ErrorResponse::class.java))
                 .useDefaultResponseMessages(false)
                 .ignoredParameterTypes(AuthenticationPrincipal::class.java)
