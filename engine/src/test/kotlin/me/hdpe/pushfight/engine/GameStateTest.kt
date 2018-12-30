@@ -134,7 +134,7 @@ class GameStateTest {
                     InitialPlacementCommand(PieceType.KING, 0, 0),
                     InitialPlacementCommand(PieceType.PAWN, 1, 0)))
 
-            assertThat(after, matchesGameState(config, matchesSetupWithPlayer1Unplaced(pieces[1]),
+            assertThat(after, matchesGameState(sameInstance(config), matchesSetupWithPlayer1Unplaced(pieces[1]),
                     board = matchesBoard(arrayOf(squareArray(BoardSquare(pieces[2]), BoardSquare(pieces[0]))))))
         }
     }
@@ -244,7 +244,7 @@ class GameStateTest {
 
             val after = before.withUpdatedPlacements(player1, listOf(UpdatedPlacementCommand(0, 0, 2, 0)))
 
-            assertThat(after, matchesGameState(config, board = matchesBoard(arrayOf(
+            assertThat(after, matchesGameState(sameInstance(config), board = matchesBoard(arrayOf(
                     squareArray(BoardSquare(), BoardSquare(piece2), BoardSquare(piece1)))), turn = equalTo(turn)))
         }
     }
@@ -288,7 +288,7 @@ class GameStateTest {
 
             val after = before.withSetupConfirmed(player1)
 
-            assertThat(after, matchesGameState(config, matchesSetupWithPlayer1SetupComplete(),
+            assertThat(after, matchesGameState(sameInstance(config), matchesSetupWithPlayer1SetupComplete(),
                     board = matchesBoard(arrayOf(squareArray(BoardSquare())))))
         }
     }
@@ -436,7 +436,7 @@ class GameStateTest {
 
             val after = before.withMove(player1, 0, 1, 1, 0)
 
-            assertThat(after, matchesGameState(config,
+            assertThat(after, matchesGameState(sameInstance(config),
                     turn = matchesTurn(moves = equalTo(1)),
                     board = matchesBoard(arrayOf(
                         squareArray(AbyssSquare(), BoardSquare(pieceToMove)),
@@ -672,7 +672,7 @@ class GameStateTest {
 
             val after = before.withPush(player1, 0, 0, 1, 0)
 
-            assertThat(after, matchesGameState(config, result = matchesNullResultState()))
+            assertThat(after, matchesGameState(sameInstance(config), result = matchesNullResultState()))
         }
 
         @Test
@@ -682,7 +682,7 @@ class GameStateTest {
 
             val after = before.withPush(player1, 0, 0, 1, 0)
 
-            assertThat(after, matchesGameState(config, result = matchesResultState(equalTo(player1))))
+            assertThat(after, matchesGameState(sameInstance(config), result = matchesResultState(equalTo(player1))))
         }
 
         @Test
@@ -756,12 +756,13 @@ class GameStateTest {
                 hasFeature("message", { it.message }, equalTo(message)))
     }
 
-    private fun matchesGameState(config: GameConfig, setup: Matcher<SetupState> = any(SetupState::class.java),
+    private fun matchesGameState(config: Matcher<GameConfig> = any(GameConfig::class.java),
+                                 setup: Matcher<SetupState> = any(SetupState::class.java),
                                  turn: Matcher<TurnState> = any(TurnState::class.java),
                                  board: Matcher<Board> = any(Board::class.java),
                                  result: Matcher<ResultState?> = anyOf(any(ResultState::class.java), nullValue())): Matcher<GameState> {
         return compose("a GameState with",
-                hasFeature("config", { it.config }, sameInstance(config)),
+                hasFeature("config", { it.config }, config),
                 hasFeature("setup", { it.setup }, setup),
                 hasFeature("turn", { it.turn }, turn),
                 hasFeature("board", { it.board }, board),
@@ -770,13 +771,13 @@ class GameStateTest {
 
     private fun matchesSetupWithPlayer1Unplaced(vararg unplaced: Piece): Matcher<SetupState> {
         return compose("a SetupState with",
-                hasFeature("player1Setup", SetupState::player1Setup, compose("a PlayerSetupState with",
+                hasFeature("player1Setup", { it.player1Setup }, compose("a PlayerSetupState with",
                         hasFeature("unplaced", PlayerSetupState::unplaced, contains(*unplaced)))))
     }
 
     private fun matchesSetupWithPlayer1SetupComplete(): Matcher<SetupState> {
         return compose("a SetupState with",
-                hasFeature("player1Setup", SetupState::player1Setup, compose("a PlayerSetupState with",
+                hasFeature("player1Setup", { it.player1Setup }, compose("a PlayerSetupState with",
                         hasFeature("complete", PlayerSetupState::complete, equalTo(true)))))
     }
 
