@@ -39,9 +39,17 @@ class WebSecurityConfig(val authenticationProvider: AccessKeyAuthenticationProvi
     }
 
     override fun configure(web: WebSecurity) {
+        var ignored = listOf("/token", "/error", "/v2/api-docs", "/", "/docs", "/docs/**", "/favicon.ico")
+
+        ignored += listOf(
+                "/swagger-ui.html",
+                "/swagger-resources/**",
+                "/webjars/**"
+        )
+
         web
             .ignoring()
-                .antMatchers("/token", "/error", "/v2/api-docs", "/", "/docs", "/docs/**", "/favicon.ico")
+                .antMatchers(*ignored.toTypedArray())
     }
 
     private fun jwtAuthenticationFilter() = JwtAuthenticationFilter(signingKeyProvider, securityContextAccessor)
