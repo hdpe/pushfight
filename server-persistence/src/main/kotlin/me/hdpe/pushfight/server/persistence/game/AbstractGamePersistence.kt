@@ -14,6 +14,6 @@ abstract class AbstractGamePersistence : GamePersistence {
     protected fun createWebGame(players: Pair<WebPlayer, WebPlayer>,
                                 gameStateCreator: (Pair<Player, Player>) -> GameState): WebGame {
         return WebGame(UUID.randomUUID().toString(), players.first.accountId, players.second.accountId,
-                gameStateCreator(players), null)
+                gameStateCreator(players), null, null)
     }
 }

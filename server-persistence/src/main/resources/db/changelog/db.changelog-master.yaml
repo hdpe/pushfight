@@ -8,3 +8,9 @@ databaseChangeLog:
   - include:
       file: 0003-add-account-table.yaml
       relativeToChangelogFile: true
+  - include:
+      file: 0004-add-game-last-modified.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: 0005-add-account-username-normalizing.yaml
+      relativeToChangelogFile: true

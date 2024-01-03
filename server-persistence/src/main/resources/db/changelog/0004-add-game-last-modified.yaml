@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: ryan at hdpe dot me
+      changes:
+        - addColumn:
+            tableName: games
+            columns:
+              - column:
+                  name: last_modified
+                  type: datetime
+                  constraints:
+                    nullable: false

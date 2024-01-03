@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 5
+      author: ryan at hdpe dot me
+      changes:
+        - dropUniqueConstraint:
+            tableName: accounts
+            constraintName: uc_accounts_username
+        - addColumn:
+            tableName: accounts
+            columns:
+              - column:
+                  name: normalized_username
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+        - update:
+            tableName: accounts
+            columns:
+              - column:
+                  name: normalized_username
+                  valueComputed: lower(username)
+        - addNotNullConstraint:
+            tableName: accounts
+            columnName: normalized_username
+        - addUniqueConstraint:
+            tableName: accounts
+            columnNames: normalized_username
+            constraintName: uc_accounts_normalized_username

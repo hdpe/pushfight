@@ -13,4 +13,7 @@ class AccountEntity(
 
         @Column(name = "username")
         var username: String
-)
+) {
+    @Column(name = "normalized_username")
+    var normalizedUsername: String = username.lowercase()
+}

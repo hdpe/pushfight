@@ -40,5 +40,5 @@ class DatabaseGamePersistence(val repository: WebGameRepository, val mapper: Sta
 
     private fun toWebGame(entity: WebGameEntity) =
             WebGame(entity.id, entity.player1AccountId, entity.player2AccountId, mapper.deserialize(entity.state),
-                    entity.victorAccountId)
+                    entity.victorAccountId, entity.lastModified)
 }

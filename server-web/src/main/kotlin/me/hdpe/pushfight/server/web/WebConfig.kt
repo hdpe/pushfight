@@ -1,6 +1,7 @@
 package me.hdpe.pushfight.server.web
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes
@@ -18,6 +19,6 @@ class WebConfig {
     @Bean
     fun objectMapperBuilderCustomizer(): Jackson2ObjectMapperBuilderCustomizer =
             Jackson2ObjectMapperBuilderCustomizer { builder ->
-                builder.modules(WebJacksonModule(), KotlinModule())
+                builder.modules(WebJacksonModule(), JavaTimeModule(), KotlinModule())
                         .serializationInclusion(JsonInclude.Include.NON_NULL) }
 }

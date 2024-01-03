@@ -2,6 +2,8 @@ package me.hdpe.pushfight.server.persistence.game
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import me.hdpe.pushfight.engine.GameState
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 class WebGame(
         val id: String,
@@ -12,7 +14,9 @@ class WebGame(
 
         val gameState: GameState,
 
-        @get:JsonIgnore val victorAccountId: String?
+        @get:JsonIgnore val victorAccountId: String?,
+
+        val lastModified: LocalDateTime?
 ) {
     fun getPlayer(number: Int): WebPlayer {
         return with(gameState.config) { if (number == 1) player1 else player2 } as WebPlayer
