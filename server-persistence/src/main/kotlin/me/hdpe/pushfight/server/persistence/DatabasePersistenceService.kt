@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional
 class DatabasePersistenceService(val gamePersistence: GamePersistence, val accountPersistence: AccountPersistence) :
         PersistenceService {
 
+    @Transactional(readOnly = true)
     override fun getAccount(username: String): AccountDetails = accountPersistence.getAccount(username)
 
     @Transactional
