@@ -18,6 +18,17 @@ pushfight:
     clients-json: '[]'
     signing-key: ''
 
+# Local Postgres properties
+---
+spring:
+  profiles: local-postgres
+  datasource:
+    url: jdbc:postgresql://localhost/pushfight_api
+    username: pushfight
+    password: password
+  liquibase:
+    contexts: postgres
+
 # Production properties
 ---
 

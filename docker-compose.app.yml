@@ -1,0 +1,22 @@
+version: '3.9'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PUSHFIGHT_SECURITY_SIGNING_KEY=V6qJtDCEquDuGFeEDxyqNrIgPDgot9628eGmhrLN1bwLmWikKKnvnMGKeBHrIuQuYZ7CvmSYNPsNf9iFJQ5dMA==
+      - PUSHFIGHT_SECURITY_CLIENTS_JSON=[{"id":"1","name":"pushfight-react-native-client","accessKeyId":"5f3530f0-6934-49ed-b260-d59ed05f4374","secret":"VgDvmCUJFqd9SMOPpuY13l06TRbKAHapGAr2x3mDtT4zyxHl8WnEDRWLn/UKY/30M5uXZvoWD86Xdpk+y5vrYw=="}]
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres/pushfight_api
+      - SPRING_DATASOURCE_USERNAME=pushfight
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_LIQUIBASE_CONTEXTS=postgres
+    networks:
+      - default
+      - pushfight_api
+
+networks:
+  pushfight_api:
+    external: true

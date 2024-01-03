@@ -23,8 +23,9 @@
 
 		<jjwt.version>0.10.5</jjwt.version>
 		<junit.version>5.3.1</junit.version>
-		<kotlin.version>1.2.71</kotlin.version>
+		<kotlin.version>1.9.21</kotlin.version>
 		<swagger2markup.version>1.3.3</swagger2markup.version>
+		<spring.boot.version>2.0.5.RELEASE</spring.boot.version>
 	</properties>
 	
 	<build>
@@ -73,6 +74,12 @@
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.22.0</version>
+				</plugin>
+				
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+					<version>${spring.boot.version}</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -216,7 +223,7 @@
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
-				<version>2.0.5.RELEASE</version>
+				<version>${spring.boot.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
