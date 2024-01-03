@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface WebGameRepository : CrudRepository<WebGameEntity, String> {
 
-    @Query("from #{#entityName} where (player1AccountId = ?1 or player2AccountId = ?1) and victorAccountId is null")
+    @Query("from #{#entityName} where (player1AccountId = ?1 or player2AccountId = ?1) and victorAccountId is null order by lastModified desc")
     fun findAllActiveByAccountId(accountId: String): List<WebGameEntity>
 }
