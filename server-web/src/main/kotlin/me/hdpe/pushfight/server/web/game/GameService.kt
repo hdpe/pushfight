@@ -80,7 +80,7 @@ class GameService(val gameStateFactory: GameStateFactory, val accountService: Ac
                     game.id,
                     opponent,
                     accountService.getActiveAccounts().find { it.id == opponent }!!.name,
-                    game.gameState.turn,
+                    if (game.gameState.setup.isComplete()) game.gameState.turn else null,
                     game.gameState.result
             )
         }
