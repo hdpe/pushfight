@@ -1,3 +1,17 @@
+repository:=471112958535.dkr.ecr.us-east-1.amazonaws.com
+
+image:
+	docker build -t pushfight-api .
+
+push:
+	aws ecr get-login-password --region us-east-1 | \
+		docker login \
+			--username AWS \
+			--password-stdin \
+			$(repository)
+	docker tag pushfight-api $(repository)/pushfight-api
+	docker push $(repository)/pushfight-api
+
 start-deps:
 	docker compose \
 		-f docker-compose.deps.yml \
