@@ -3,6 +3,8 @@ package me.hdpe.pushfight.server.persistence.game
 import me.hdpe.pushfight.engine.GameState
 import me.hdpe.pushfight.engine.Player
 import org.springframework.stereotype.Service
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 @Service
 class DatabaseGamePersistence(val repository: WebGameRepository, val mapper: StateMapper) : AbstractGamePersistence() {
@@ -40,5 +42,5 @@ class DatabaseGamePersistence(val repository: WebGameRepository, val mapper: Sta
 
     private fun toWebGame(entity: WebGameEntity) =
             WebGame(entity.id, entity.player1AccountId, entity.player2AccountId, mapper.deserialize(entity.state),
-                    entity.victorAccountId, entity.lastModified)
+                    entity.victorAccountId, ZonedDateTime.of(entity.lastModified, ZoneId.systemDefault()))
 }

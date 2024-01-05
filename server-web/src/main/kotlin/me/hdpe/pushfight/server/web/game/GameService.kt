@@ -13,6 +13,8 @@ import me.hdpe.pushfight.server.web.security.ClientDetails
 import me.hdpe.pushfight.server.web.util.accountFromId
 import me.hdpe.pushfight.server.web.util.accountFromIdOrPrincipal
 import org.springframework.stereotype.Service
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 @Service
 class GameService(val gameStateFactory: GameStateFactory, val accountService: AccountService,
@@ -81,7 +83,8 @@ class GameService(val gameStateFactory: GameStateFactory, val accountService: Ac
                     opponent,
                     accountService.getActiveAccounts().find { it.id == opponent }!!.name,
                     if (game.gameState.setup.isComplete()) game.gameState.turn else null,
-                    game.gameState.result
+                    game.gameState.result,
+                    game.lastModified
             )
         }
     }
