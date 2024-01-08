@@ -12,6 +12,12 @@ push:
 	docker tag pushfight-api $(repository)/pushfight-api
 	docker push $(repository)/pushfight-api
 
+deploy:
+	aws ecs update-service \
+		--cluster cluster1 \
+		--service pushfight-api \
+		--force-new-deployment
+
 start-deps:
 	docker compose \
 		-f docker-compose.deps.yml \
