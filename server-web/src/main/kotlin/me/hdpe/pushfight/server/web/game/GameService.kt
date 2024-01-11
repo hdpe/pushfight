@@ -9,6 +9,7 @@ import me.hdpe.pushfight.server.persistence.PersistenceService
 import me.hdpe.pushfight.server.persistence.game.CreatePlayerCommand
 import me.hdpe.pushfight.server.persistence.game.WebGame
 import me.hdpe.pushfight.server.web.accounts.AccountService
+import me.hdpe.pushfight.server.web.notifications.NotificationsManager
 import me.hdpe.pushfight.server.web.security.ClientDetails
 import me.hdpe.pushfight.server.web.util.accountFromId
 import me.hdpe.pushfight.server.web.util.accountFromIdOrPrincipal
@@ -18,7 +19,7 @@ import java.time.ZonedDateTime
 
 @Service
 class GameService(val gameStateFactory: GameStateFactory, val accountService: AccountService,
-                  val persistenceService: PersistenceService) {
+                  val persistenceService: PersistenceService, val notificationsManager: NotificationsManager) {
 
     fun createGame(principal: ClientDetails, accountId: String?, opponentId: String): WebGame {
         val aggressor = accountFromIdOrPrincipal(accountService, accountId, principal)
@@ -50,7 +51,12 @@ class GameService(val gameStateFactory: GameStateFactory, val accountService: Ac
     }
 
     fun putSetupConfirmation(principal: ClientDetails, gameId: String, playerNumber: Int): WebGame {
-        return updateGame(principal, gameId, playerNumber) { state, player -> state.withSetupConfirmed(player) }
+        val updated = updateGame(principal, gameId, playerNumber) { state, player ->
+            state.withSetupConfirmed(player) }
+
+        notificationsManager.notifySetupComplete(playerNumber, updated)
+
+        return updated
     }
 
     fun putMove(principal: ClientDetails, gameId: String, playerNumber: Int, startX: Int, startY: Int, endX: Int,
@@ -61,8 +67,12 @@ class GameService(val gameStateFactory: GameStateFactory, val accountService: Ac
 
     fun putPush(principal: ClientDetails, gameId: String, playerNumber: Int, startX: Int, startY: Int, endX: Int,
                 endY: Int): WebGame {
-        return updateGame(principal, gameId, playerNumber) { state, player ->
+        val updated = updateGame(principal, gameId, playerNumber) { state, player ->
             state.withPush(player, startX, startY, endX, endY) }
+
+        notificationsManager.notifyMoveEnd(playerNumber, updated)
+
+        return updated
     }
 
     fun resign(principal: ClientDetails, gameId: String, playerNumber: Int): WebGame {

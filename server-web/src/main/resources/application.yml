@@ -17,6 +17,8 @@ pushfight:
   security:
     clients-json: '[]'
     signing-key: ''
+  notifications:
+    sqs-url: ''
 
 # Local Postgres properties
 ---
