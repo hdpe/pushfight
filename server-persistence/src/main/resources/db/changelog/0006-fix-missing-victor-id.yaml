@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 6
+      author: ryan at hdpe dot me
+      context: postgres
+      changes:
+        - update:
+            tableName: games
+            columns:
+              - column:
+                  name: victor_account_id
+                  valueComputed: "state::json#>>'{result,victor,accountId}'"

@@ -3,6 +3,7 @@ package me.hdpe.pushfight.server.persistence.game
 import me.hdpe.pushfight.engine.GameState
 import me.hdpe.pushfight.engine.Player
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
@@ -32,12 +33,15 @@ class DatabaseGamePersistence(val repository: WebGameRepository, val mapper: Sta
         val entity = repository.findById(id).orElseThrow { createNoSuchGameException(id) }
 
         entity.state = mapper.serialize(gameState)
+        entity.victorAccountId = gameState.result?.victor?.number?.let {
+            if (it == 1) entity.player1AccountId else entity.player2AccountId
+        }
 
         return toWebGame(entity)
     }
 
     override fun getActiveGames(accountId: String): List<WebGame> {
-        return repository.findAllActiveByAccountId(accountId).map { toWebGame(it) }
+        return repository.findAllByAccountIdSince(accountId, LocalDateTime.now().minusDays(7)).map { toWebGame(it) }
     }
 
     private fun toWebGame(entity: WebGameEntity) =
