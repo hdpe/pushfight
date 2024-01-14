@@ -17,3 +17,6 @@ databaseChangeLog:
   - include:
       file: 0006-fix-missing-victor-id.yaml
       relativeToChangelogFile: true
+  - include:
+      file: 0007-add-account-exclude-from-statistics.yaml
+      relativeToChangelogFile: true

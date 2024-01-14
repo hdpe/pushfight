@@ -17,6 +17,6 @@ fun accountFromIdOrPrincipal(accountService: AccountService, accountId: String?,
 }
 
 fun accountFromId(accountService: AccountService, accountId: String): AccountResult {
-    return accountService.getActiveAccounts().find { it.id == accountId }
+    return accountService.getById(accountId)
             ?: throw BadPlayRequestException("no such account '$accountId'")
 }

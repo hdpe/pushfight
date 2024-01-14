@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: 7
+      author: ryan at hdpe dot me
+      changes:
+        - addColumn:
+            tableName: accounts
+            columns:
+              - column:
+                  name: exclude_from_statistics
+                  type: boolean
+                  constraints:
+                    nullable: true
+        - update:
+            tableName: accounts
+            columns:
+              - column:
+                  name: exclude_from_statistics
+                  valueBoolean: 'false'
+        - addNotNullConstraint:
+            tableName: accounts
+            columnName: exclude_from_statistics

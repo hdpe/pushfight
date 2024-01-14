@@ -1,9 +1,7 @@
 package me.hdpe.pushfight.server.web.accounts
 
 import me.hdpe.pushfight.server.persistence.PersistenceService
-import me.hdpe.pushfight.server.persistence.account.AccountDetails
-import me.hdpe.pushfight.server.persistence.account.CreateAccountCommand
-import me.hdpe.pushfight.server.persistence.account.USERNAME_UNIQUE_CONSTRAINT_NAME
+import me.hdpe.pushfight.server.persistence.account.*
 import me.hdpe.pushfight.server.persistence.util.isConstraintViolation
 import me.hdpe.pushfight.server.web.security.ClientDetails
 import org.springframework.dao.DataAccessException
@@ -32,9 +30,16 @@ class AccountService(private val persistenceService: PersistenceService) {
         return toAccountResult(details)
     }
 
-    fun get(username: String): AccountResult = toAccountResult(persistenceService.getAccount(username))
+    fun get(username: String): AccountResult = persistenceService.getAccount(username)?.let { toAccountResult(it) }
+            ?: throw NoSuchAccountException(username)
 
-    fun getActiveAccounts(): List<AccountResult> = persistenceService.getActiveAccounts().map { toAccountResult(it) }
+    fun getById(id: String): AccountResult? = persistenceService.getAccountById(id)?.let { toAccountResult(it) }
+
+    fun getActiveAccounts(): List<AccountWithStatisticsResult> = persistenceService.getActiveAccounts()
+            .map { toAccountWithStatisticsResult(it) }
 
     private fun toAccountResult(details: AccountDetails): AccountResult = AccountResult(details.id, details.name)
+
+    private fun toAccountWithStatisticsResult(details: AccountWithStatisticsDetails): AccountWithStatisticsResult =
+            AccountWithStatisticsResult(details.id, details.name, details.played, details.won, details.lost)
 }

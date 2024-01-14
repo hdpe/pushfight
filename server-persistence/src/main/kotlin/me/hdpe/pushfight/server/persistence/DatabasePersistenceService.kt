@@ -4,6 +4,7 @@ import me.hdpe.pushfight.engine.GameState
 import me.hdpe.pushfight.engine.Player
 import me.hdpe.pushfight.server.persistence.account.AccountDetails
 import me.hdpe.pushfight.server.persistence.account.AccountPersistence
+import me.hdpe.pushfight.server.persistence.account.AccountWithStatisticsDetails
 import me.hdpe.pushfight.server.persistence.account.CreateAccountCommand
 import me.hdpe.pushfight.server.persistence.game.CreatePlayerCommand
 import me.hdpe.pushfight.server.persistence.game.GamePersistence
@@ -16,7 +17,10 @@ class DatabasePersistenceService(val gamePersistence: GamePersistence, val accou
         PersistenceService {
 
     @Transactional(readOnly = true)
-    override fun getAccount(username: String): AccountDetails = accountPersistence.getAccount(username)
+    override fun getAccount(username: String): AccountDetails? = accountPersistence.getAccount(username)
+
+    @Transactional(readOnly = true)
+    override fun getAccountById(id: String): AccountDetails? = accountPersistence.getAccountById(id)
 
     @Transactional
     override fun createGame(createPlayerCommands: Pair<CreatePlayerCommand, CreatePlayerCommand>,
@@ -36,5 +40,5 @@ class DatabasePersistenceService(val gamePersistence: GamePersistence, val accou
     override fun createAccount(command: CreateAccountCommand): AccountDetails = accountPersistence.createAccount(command)
 
     @Transactional(readOnly = true)
-    override fun getActiveAccounts(): List<AccountDetails> = accountPersistence.getActiveAccounts()
+    override fun getActiveAccounts(): List<AccountWithStatisticsDetails> = accountPersistence.getActiveAccounts()
 }

@@ -22,7 +22,7 @@ class AccountsController(private val service: AccountService) {
     @AuthorizationHeaderRequired
     @AuthenticationRequiredRequestWithNoContentApiResponses
     fun accounts(@AuthenticationPrincipal principal: ClientDetails,
-                 @RequestParam(value = "accountId", required = false) accountId: String?): List<AccountResult> {
+                 @RequestParam(value = "accountId", required = false) accountId: String?): List<AccountWithStatisticsResult> {
         val account = accountFromIdOrPrincipal(service, accountId, principal)
 
         return service.getActiveAccounts().asSequence().filter { it.id != account.id }.toList()
