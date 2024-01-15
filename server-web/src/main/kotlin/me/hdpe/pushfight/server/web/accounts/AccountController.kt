@@ -4,7 +4,6 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import me.hdpe.pushfight.server.persistence.account.NoSuchAccountException
 import me.hdpe.pushfight.server.web.AuthenticationRequiredRequestWithContentApiResponsesAndConflict
-import me.hdpe.pushfight.server.web.AuthenticationRequiredRequestWithNoContentApiResponses
 import me.hdpe.pushfight.server.web.AuthorizationHeaderRequired
 import me.hdpe.pushfight.server.web.security.ClientDetails
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -29,8 +28,8 @@ class AccountController(val service: AccountService) {
     @ApiOperation(value = "Get Account", nickname = "getAccount")
     @AuthorizationHeaderRequired
     @AuthenticationAndAccountFoundRequiredRequestWithNoContentApiResponses
-    fun account(@RequestParam("username") username: String): AccountResult {
-        return service.get(username);
+    fun account(@RequestParam("username") username: String): AccountWithStatisticsResult {
+        return service.getActiveAccounts().firstOrNull { it.name == username } ?: throw NoSuchAccountException(username);
     }
 
     @ExceptionHandler(AccountCreationForbiddenException::class)
