@@ -41,7 +41,7 @@ class DatabaseGamePersistence(val repository: WebGameRepository, val mapper: Sta
     }
 
     override fun getActiveGames(accountId: String): List<WebGame> {
-        return repository.findAllByAccountIdSince(accountId, LocalDateTime.now().minusDays(7)).map { toWebGame(it) }
+        return repository.findAllByAccountIdAndNotVictorOrModifiedSince(accountId, LocalDateTime.now().minusDays(7)).map { toWebGame(it) }
     }
 
     private fun toWebGame(entity: WebGameEntity) =
