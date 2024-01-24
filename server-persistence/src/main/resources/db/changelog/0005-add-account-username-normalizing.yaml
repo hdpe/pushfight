@@ -2,6 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 5
       author: ryan at hdpe dot me
+      validCheckSum: 7:57d78fc51242d5c22790d6c69fd49999
       changes:
         - dropUniqueConstraint:
             tableName: accounts
@@ -23,6 +24,7 @@ databaseChangeLog:
         - addNotNullConstraint:
             tableName: accounts
             columnName: normalized_username
+            columnDataType: varchar(255)
         - addUniqueConstraint:
             tableName: accounts
             columnNames: normalized_username

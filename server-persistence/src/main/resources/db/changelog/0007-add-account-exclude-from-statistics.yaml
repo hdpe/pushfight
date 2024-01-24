@@ -2,6 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 7
       author: ryan at hdpe dot me
+      validCheckSum: 7:f10b67b3ef2e8951b8807c6d10fc878d
       changes:
         - addColumn:
             tableName: accounts
@@ -20,3 +21,4 @@ databaseChangeLog:
         - addNotNullConstraint:
             tableName: accounts
             columnName: exclude_from_statistics
+            columnDataType: boolean
