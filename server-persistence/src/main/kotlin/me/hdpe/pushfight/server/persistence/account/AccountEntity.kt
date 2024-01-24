@@ -16,4 +16,7 @@ class AccountEntity(
 ) {
     @Column(name = "normalized_username")
     var normalizedUsername: String = username.lowercase()
+
+    @Column(name = "exclude_from_statistics")
+    var excludeFromStatistics: Boolean = false
 }
