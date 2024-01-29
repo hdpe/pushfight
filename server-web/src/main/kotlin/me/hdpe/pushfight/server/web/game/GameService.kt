@@ -14,8 +14,6 @@ import me.hdpe.pushfight.server.web.security.ClientDetails
 import me.hdpe.pushfight.server.web.util.accountFromId
 import me.hdpe.pushfight.server.web.util.accountFromIdOrPrincipal
 import org.springframework.stereotype.Service
-import java.time.ZoneId
-import java.time.ZonedDateTime
 
 @Service
 class GameService(val gameStateFactory: GameStateFactory, val accountService: AccountService,
@@ -79,24 +77,10 @@ class GameService(val gameStateFactory: GameStateFactory, val accountService: Ac
         return updateGame(principal, gameId, playerNumber) { state, player -> state.withResign(player) }
     }
 
-    fun getActiveGames(principal: ClientDetails, accountId: String?): List<GameSummary> {
+    fun getActiveGames(principal: ClientDetails, accountId: String): List<GameSummary> {
         val account = accountFromIdOrPrincipal(accountService, accountId, principal)
 
-        return persistenceService.getActiveGames(account.id).map { game ->
-            val opponent = when (accountId) {
-                game.player1AccountId -> game.player2AccountId
-                else -> game.player1AccountId
-            }
-
-            GameSummary(
-                    game.id,
-                    opponent,
-                    accountService.getActiveAccounts().find { it.id == opponent }!!.name,
-                    if (game.gameState.setup.isComplete()) game.gameState.turn else null,
-                    game.gameState.result,
-                    game.lastModified
-            )
-        }
+        return persistenceService.getActiveGames(account.id).map(toGameSummary(accountId))
     }
 
     private fun updateGame(principal: ClientDetails, gameId: String,
@@ -118,4 +102,34 @@ class GameService(val gameStateFactory: GameStateFactory, val accountService: Ac
 
     private fun toEngineCommand(placement: UpdatedPlacement) =
             UpdatedPlacementCommand(placement.currentX!!, placement.currentY!!, placement.newX!!, placement.newY!!)
+
+    private fun toGameSummary(accountId: String) = { game: WebGame ->
+        val setup = game.gameState.setup
+
+        val playerIndex1 = when (accountId) {
+            game.player1AccountId -> 1
+            else -> 2
+        }
+
+        val playerSetup = when (accountId) {
+            game.player1AccountId -> setup.player1Setup
+            else -> setup.player2Setup
+        }
+
+        val opponent = when (accountId) {
+            game.player1AccountId -> game.player2AccountId
+            else -> game.player1AccountId
+        }
+
+        GameSummary(
+                id = game.id,
+                opponentId = opponent,
+                opponentName = accountService.getActiveAccounts().find { it.id == opponent }!!.name,
+                currentTurn = if (game.gameState.setup.isComplete()) game.gameState.turn else null,
+                playerSetupComplete = playerSetup.complete,
+                playerIndex1 = playerIndex1,
+                result = game.gameState.result,
+                lastModified = game.lastModified
+        )
+    }
 }

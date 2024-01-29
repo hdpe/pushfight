@@ -22,7 +22,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.request.RequestPostProcessor
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
@@ -269,7 +268,7 @@ class WriteApiExamples {
     }
 
     private fun getActiveGames() {
-        mockMvc.perform(get("/games/active")
+        mockMvc.perform(get("/games/active").param("accountId", writeState.accountIdsByName[ExampleAccountNames.YOU])
                 .with(headers(content = false, authorised = true)))
                 .andExpect(status().isOk)
                 .andDo { result -> writeRequestUri("Example Request", "getActiveGames", result) }
